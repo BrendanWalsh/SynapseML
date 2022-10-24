@@ -225,6 +225,10 @@ trait HasInternalJsonOutputParser {
   }
 }
 
+trait HasInternalStringOutputParser {
+  protected def getInternalOutputParser(schema: StructType): HTTPOutputParser = new StringOutputParser()
+}
+
 trait HasUrlPath {
   def urlPath: String
 }
