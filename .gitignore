@@ -27,6 +27,8 @@
 .vscode
 .idea
 .metals
+.bloop
+metals.sbt
 
 # .NET plugins and build
 .metals
@@ -39,6 +41,9 @@
 # temp ignore these two for local tests
 /dotnetSanityCheck/**/bin
 /dotnetSanityCheck/**/obj
+
+# VSCode development
+.bloop
 
 # Vagrant configuration
 /tools/vagrant/.vagrant
