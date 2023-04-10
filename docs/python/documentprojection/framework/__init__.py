@@ -1,1 +1,1 @@
-from documentprojection.framework.objects import *
+from .objects import *

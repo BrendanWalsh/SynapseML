@@ -2,27 +2,35 @@ import os
 from typing import List
 from nbformat import NotebookNode, read
 from pathlib import Path
-from documentprojection.utils.logging import get_log
+from .logging import get_log
 
 log = get_log(__name__)
 
+
 def get_mock_path():
-    return str(Path(__file__).with_name('mocks').joinpath("mock_notebook.ipynb"))
+    return str(Path(__file__).with_name("mocks").joinpath("mock_notebook.ipynb"))
+
 
 def parse_notebooks(notebooks: List[str], recursive=False) -> List[str]:
     concrete_notebook_paths = []
     ignored_directories = []
     for notebook in notebooks:
         if not os.path.exists(notebook):
-            raise ValueError(f"Specified notebook path {notebook.path} does not exist.")
+            raise ValueError(
+                f"Specified notebook path {repr(notebook)} does not exist."
+            )
         is_dir = os.path.isdir(notebook)
         if not is_dir:
             if recursive:
-                log.warn(f"Specified notebook path {notebook.path} is not a directory, but recursive flag is set. Ignoring recursive flag.")
+                log.warn(
+                    f"Specified notebook path {notebook.path} is not a directory, but recursive flag is set. Ignoring recursive flag."
+                )
             if not notebook.endswith(".ipynb"):
-                raise ValueError(f"Specified notebook path {notebook.path} is not a notebook. Notebooks must have a .ipynb extension.")
+                raise ValueError(
+                    f"Specified notebook path {notebook.path} is not a notebook. Notebooks must have a .ipynb extension."
+                )
             concrete_notebook_paths.append(notebook)
-        
+
         # non-recursively scan for notebooks in the given directory
         if is_dir and not recursive:
             for file_or_dir in os.listdir(notebook):
@@ -37,9 +45,13 @@ def parse_notebooks(notebooks: List[str], recursive=False) -> List[str]:
                 for file_or_dir in files:
                     if file_or_dir.endswith(".ipynb"):
                         concrete_notebook_paths.append(os.path.join(root, file_or_dir))
-                        
+
     if len(ignored_directories) > 0 and not recursive:
-        log.warn("Recursive flag is not set. Ignoring the following directories:\n   {}".format('\n   '.join(ignored_directories)))
+        log.warn(
+            "Recursive flag is not set. Ignoring the following directories:\n   {}".format(
+                "\n   ".join(ignored_directories)
+            )
+        )
 
     num_notebooks = len(concrete_notebook_paths)
     leveled_log = log.warning if num_notebooks == 0 else log.info

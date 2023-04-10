@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from nbconvert import MarkdownExporter
 
-from documentprojection.framework.objects import *
+from framework.objects import *
 
 # Sample base formatter for documents that are projected to markdown, include some cleaning, and inject a header
 class MarkdownFormatter(ABC):
@@ -13,7 +13,7 @@ class MarkdownFormatter(ABC):
         exporter = MarkdownExporter()
         markdown, _ = exporter.from_notebook_node(notebook.data)
         return markdown
-    
+
     @abstractmethod
     def clean_markdown(self, markdown: str) -> str:
         pass
