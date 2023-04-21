@@ -1,0 +1,27 @@
+resources:
+- repo: self
+
+#trigger:
+# trigger manually
+
+parameters:
+  - name: SYNAPSE_ENVIRONMENT
+    displayName: Synapse Extension E2E Test Environment
+    type: string
+    default: weekly
+    values:
+      - dev
+      - daily
+      - weekly
+
+variables:
+  runTests: True
+  CONDA_CACHE_DIR: /usr/share/miniconda/envs
+  ComponentDetection.Timeout: 900
+
+jobs:
+  my-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: my-step
+        run: echo "Hello World!"
