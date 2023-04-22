@@ -1,0 +1,25 @@
+resources:
+- repo: self
+
+parameters:
+  - name: SYNAPSE_ENVIRONMENT
+    displayName: Synapse Extension E2E Test Environment
+    type: string
+    default: weekly
+    values:
+      - dev
+      - daily
+      - weekly
+
+variables:
+  runTests: True
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    continueOnError: true
+    steps:
+    - script: echo "hello to my first Build"
