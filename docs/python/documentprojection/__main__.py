@@ -1,30 +1,39 @@
+from __future__ import absolute_import
+
+from .utils.reflection import *
 from .utils.logging import *
 from .utils.notebook import *
 from .framework.pipeline import *
-from .channels.website import *
+from .channels import default_channels
 
 import re
 
 log = get_log(__name__)
 
 
-def get_channel_map():
+def get_channel_map(custom_channels_folder, cwd):
+
+    sys.path.insert(0, "documentprojection")
+
     def camel_to_snake(name):
         s1 = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
         s2 = re.sub("([a-z0-9])([A-Z])", r"\1_\2", s1).lower()
         return s2.replace("_channel", "")
 
+    channels = default_channels.copy()
+    if custom_channels_folder is not None and len(custom_channels_folder) > 0:
+        channels.extend(get_channels_from_dir(custom_channels_folder, cwd))
+
     channel_map = {
         k: v
         for k, v in [
-            (camel_to_snake(channel.__name__), channel) for channel in all_channels
+            (camel_to_snake(channel.__name__), channel) for channel in channels
         ]
     }
     return channel_map
 
 
 def parse_args():
-    channel_choice_names = ["all"] + list(get_channel_map())
     log_level_choices = ["debug", "info", "warn", "error", "critical"]
 
     import argparse
@@ -73,10 +82,16 @@ def parse_args():
     )
     parser.add_argument(
         "-c",
-        "--channel",
-        choices=channel_choice_names,
+        "--channels",
         default="console",
-        help="the channel through which the notebook(s) should be processed. defaults to all if not specified.",
+        type=str,
+        help="A channel or comma-separated list of channels through which the notebook(s) should be processed. defaults to console if not specified.",
+    )
+    parser.add_argument(
+        "--customchannels",
+        type=str,
+        default=None,
+        help="A folder containing custom channel implementations.",
     )
     parser.add_argument(
         "-v",
@@ -107,9 +122,16 @@ def run():
     log.debug("notebooks specified: {}".format(notebooks))
 
     pipeline = DocumentProjectionPipeline(config=PipelineConfig(vars(args)))
-    channels = (
-        all_channels if args.channel == "all" else [get_channel_map()[args.channel]]
-    )
+    channels = []
+    channel_map = get_channel_map(args.customchannels, args.project_root)
+    for channel in args.channels.split(","):
+        if channel not in channel_map:
+            log.critical(
+                f"Channel '{channel}' not found. If this is a custom channel, make sure it is in the custom channels folder and that the folder is specified with the --customchannels argument."
+            )
+            return
+
+        channels.append(channel_map[channel])
     pipeline.register_channels(channels)
     pipeline.run(notebooks)
 

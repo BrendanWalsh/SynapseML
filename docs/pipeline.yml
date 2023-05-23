@@ -1,0 +1,36 @@
+trigger:
+  branches:
+    include:
+      - main
+
+resources:
+  repositories:
+    - repository: synapse_ml
+      type: github
+      #name: microsoft/SynapseML
+      name: BrendanWalsh/SynapseML
+      #ref: refs/heads/master
+      ref: refs/heads/nbpipeline
+      endpoint: synapse_ml_connection
+
+jobs:
+  - job: Conda
+    steps:
+    - template: templates/conda.yml@synapse_ml
+  - template: templates/test_e2e.yml@synapse_ml
+    parameters:
+      dependsOn: Conda
+      testConfigurationPath: notebooks/BaseTestConfiguration.json
+  - job: PublishNotebooks
+    condition: succeeded()
+    dependsOn: E2E
+    cancelTimeoutInMinutes: 0
+    pool:
+      vmImage: ubuntu-22.04
+    steps:
+    - checkout: synapse_ml
+    - template: templates/publish_notebooks.yml@synapse_ml
+      parameters:
+          customChannelsFolder: docs/python/synapseml_channels
+          channelList: website
+          notebooksFolder: notebooks/features

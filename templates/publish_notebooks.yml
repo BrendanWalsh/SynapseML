@@ -1,0 +1,36 @@
+parameters:
+  - name: customChannelsFolder
+    type: string
+    default: docs/python/synapseml_channels
+  - name: channelList
+    type: string
+    default: website
+  - name: notebooksFolder
+    type: string
+    default: notebooks/features
+
+# Parent notebook must declare synapse_ml as a resource
+# resources:
+#   repositories:
+#     - repository: synapse_ml
+#       type: github
+#       name: microsoft/SynapseML
+#       ref: refs/heads/master
+#       endpoint: synapse_ml_connection
+
+steps:
+    - template: conda.yml
+    - script: |
+        source activate synapseml
+        sbt installDocumentProjectionModule
+        python -m documentprojection -r -p --customchannels ${{ parameters.customChannelsFolder }} -c ${{ parameters.channelList }} . ${{ parameters.notebooksFolder }}
+      displayName: 'Run Document Projection'
+    - script: |
+        mkdir $(Build.ArtifactStagingDirectory)/output
+        cp -r website/docs/features $(Build.ArtifactStagingDirectory)/output
+      displayName: 'Move artifacts to output directory'
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/output'
+        ArtifactName: 'MyBuildArtifact'

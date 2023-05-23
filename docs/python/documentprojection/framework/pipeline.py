@@ -1,7 +1,4 @@
 from typing import List
-from ..channels import *
-from ..channels import console
-from ..utils.notebook import get_mock_path
 from ..utils.logging import get_log
 from .objects import *
 from ..utils.notebook import *
@@ -47,6 +44,7 @@ class DocumentProjectionPipeline:
     def register_channels(self, channels: List[Channel]):
         if len(channels) == 0:
             log.warn("Extending channels with an empty list")
+        log.debug(f"Channels: {channels}")
         self.channels.extend([channel(self.ChannelConfig) for channel in channels])
         return self
 

@@ -6,7 +6,6 @@ package com.microsoft.azure.synapse.ml.nbtest
 import com.microsoft.azure.synapse.ml.Secrets
 import com.microsoft.azure.synapse.ml.build.BuildInfo
 import com.microsoft.azure.synapse.ml.core.env.FileUtilities
-import com.microsoft.azure.synapse.ml.core.env.PackageUtils._
 import com.microsoft.azure.synapse.ml.core.test.base.TestBase
 import com.microsoft.azure.synapse.ml.io.http.RESTHelpers
 import com.microsoft.azure.synapse.ml.nbtest.DatabricksUtilities.{TimeoutInMillis, monitorJob}
@@ -27,62 +26,59 @@ import scala.concurrent.{Await, ExecutionContext, Future, blocking}
 
 object DatabricksUtilities {
 
-  // ADB Info
-  val Region = "eastus"
-  val PoolName = "synapseml-build-10.4"
-  val GpuPoolName = "synapseml-build-10.4-gpu"
-  val AdbRuntime = "10.4.x-scala2.12"
-  val AdbGpuRuntime = "10.4.x-gpu-ml-scala2.12"
-  val NumWorkers = 5
-  val AutoTerminationMinutes = 15
+  val Config = new NotebooksTestBase().config
 
-  lazy val Token: String = sys.env.getOrElse("MML_ADB_TOKEN", Secrets.AdbToken)
-  lazy val AuthValue: String = "Basic " + BaseEncoding.base64()
-    .encode(("token:" + Token).getBytes("UTF-8"))
+  // ADB Info
+  val Region = Config.DatabricksConfig.SparkConfig.Region
+  val PoolName = Config.DatabricksConfig.CPUConfig.PoolName
+  val GpuPoolName = Config.DatabricksConfig.GPUConfig.PoolName
+  val AdbRuntime = Config.DatabricksConfig.CPUConfig.AdbRuntime
+  val AdbGpuRuntime = Config.DatabricksConfig.GPUConfig.AdbRuntime
+  val NumWorkers = Config.DatabricksConfig.SparkConfig.NumWorkers
+  val AutoTerminationMinutes = Config.DatabricksConfig.SparkConfig.AutoTerminationMinutes
+
+  lazy val Token: String = sys.env.getOrElse(Config.DatabricksConfig.SparkConfig.TokenRoot, Secrets.AdbToken)
+  private lazy val EncodedToken: String = BaseEncoding.base64().encode(("token:" + Token).getBytes("UTF-8"))
+  lazy val AuthValue: String = s"${Config.DatabricksConfig.SparkConfig.AuthValueRoot} ${EncodedToken}"
+
   val BaseURL = s"https://$Region.azuredatabricks.net/api/2.0/"
   lazy val PoolId: String = getPoolIdByName(PoolName)
   lazy val GpuPoolId: String = getPoolIdByName(GpuPoolName)
-  lazy val ClusterName = s"mmlspark-build-${LocalDateTime.now()}"
-  lazy val GPUClusterName = s"mmlspark-build-gpu-${LocalDateTime.now()}"
+  lazy val ClusterName = s"${Config.DatabricksConfig.CPUConfig.ClusterNameRoot}-${LocalDateTime.now()}"
+  lazy val GPUClusterName = s"${Config.DatabricksConfig.GPUConfig.ClusterNameRoot}-${LocalDateTime.now()}"
 
-  val Folder = s"/SynapseMLBuild/build_${BuildInfo.version}"
+  val Folder = s"${Config.DatabricksConfig.SparkConfig.FolderRoot}${BuildInfo.version}"
   val ScalaVersion: String = BuildInfo.scalaVersion.split(".".toCharArray).dropRight(1).mkString(".")
 
-  val Libraries: String = List(
-    Map("maven" -> Map("coordinates" -> PackageMavenCoordinate, "repo" -> PackageRepository)),
-    Map("pypi" -> Map("package" -> "nltk")),
-    Map("pypi" -> Map("package" -> "bs4")),
-    Map("pypi" -> Map("package" -> "plotly")),
-    Map("pypi" -> Map("package" -> "Pillow")),
-    Map("pypi" -> Map("package" -> "onnxmltools==1.7.0")),
-    Map("pypi" -> Map("package" -> "lightgbm")),
-    Map("pypi" -> Map("package" -> "mlflow")),
-    Map("pypi" -> Map("package" -> "openai"))
-  ).toJson.compactPrint
+  val Libraries: String = Config.DatabricksConfig.CPUConfig.libraryString
 
   // TODO: install synapse.ml.dl wheel package here
-  val GPULibraries: String = List(
-    Map("maven" -> Map("coordinates" -> PackageMavenCoordinate, "repo" -> PackageRepository)),
-    Map("pypi" -> Map("package" -> "transformers==4.15.0")),
-    Map("pypi" -> Map("package" -> "petastorm==0.12.0"))
-  ).toJson.compactPrint
+  val GPULibraries: String = Config.DatabricksConfig.GPUConfig.libraryString
 
-  val GPUInitScripts: String = List(
-    Map("dbfs" -> Map("destination" -> "dbfs:/FileStore/horovod-fix-commit/horovod_installation.sh"))
-  ).toJson.compactPrint
+  val GPUInitScripts: String = Config.DatabricksConfig.GPUConfig.initScriptString
 
   // Execution Params
-  val TimeoutInMillis: Int = 40 * 60 * 1000
+  val TimeoutInMillis: Int = Config.DatabricksConfig.ExecutionConfig.TimeoutInMillis
 
-  val NotebookFiles: Array[File] = FileUtilities.recursiveListFiles(
-    FileUtilities.join(
-      BuildInfo.baseDirectory.getParent, "notebooks", "features").getCanonicalFile)
+  val CPUNotebooksPath: Seq[String] = Config.DatabricksConfig.CPUConfig.Notebooks.Paths
+  val CPUNotebooksPathExclusions: Option[Seq[String]] = Config.DatabricksConfig.CPUConfig.Notebooks.Exclusions
+  val GPUNotebooksPath: Seq[String] = Config.DatabricksConfig.GPUConfig.Notebooks.Paths
+  val GPUNotebooksPathExclusions: Option[Seq[String]] = Config.DatabricksConfig.GPUConfig.Notebooks.Exclusions
 
-  val ParallelizableNotebooks: Seq[File] = NotebookFiles.filterNot(_.isDirectory)
+  def findNotebooks(dirs: Seq[String], filters: Seq[String]): Seq[File] = {
+    dirs.flatMap { notebooksDir =>
+      val path = if (new File(notebooksDir).isAbsolute) notebooksDir else FileUtilities
+        .join(BuildInfo.baseDirectory.getParent, notebooksDir).getCanonicalPath
+      FileUtilities.recursiveListFiles(new File(path))
+    }.filterNot(file => {
+      val path = file.getAbsolutePath
+      filters.forall(exclusion => path.contains(exclusion))
+    })
+  }
 
-  val CPUNotebooks: Seq[File] = ParallelizableNotebooks.filterNot(_.getAbsolutePath.contains("simple_deep_learning"))
+  val CPUNotebooks: Seq[File] = Config.DatabricksConfig.CPUConfig.Notebooks.notebooks
 
-  val GPUNotebooks: Seq[File] = ParallelizableNotebooks.filter(_.getAbsolutePath.contains("simple_deep_learning"))
+  val GPUNotebooks: Seq[File] = Config.DatabricksConfig.GPUConfig.Notebooks.notebooks
 
   def databricksGet(path: String): JsValue = {
     val request = new HttpGet(BaseURL + path)
@@ -129,7 +125,7 @@ object DatabricksUtilities {
          |  "overwrite": true,
          |  "format": "JUPYTER"
          |}
-       """.stripMargin
+     """.stripMargin
     databricksPost("workspace/import", body)
     ()
   }
@@ -144,7 +140,7 @@ object DatabricksUtilities {
          |  "path": "$dest",
          |  "overwrite": true
          |}
-       """.stripMargin
+     """.stripMargin
     databricksPost("dbfs/put", body)
     ()
   }
@@ -173,7 +169,7 @@ object DatabricksUtilities {
          |   },
          |  "init_scripts": $initScripts
          |}
-      """.stripMargin
+    """.stripMargin
     databricksPost("clusters/create", body).select[String]("cluster_id")
   }
 
@@ -184,7 +180,7 @@ object DatabricksUtilities {
          | "cluster_id": "$clusterId",
          | "libraries": $libraries
          |}
-      """.stripMargin)
+    """.stripMargin)
     ()
   }
 
@@ -195,7 +191,7 @@ object DatabricksUtilities {
          | "cluster_id": "$clusterId",
          | "libraries": $Libraries
          |}
-      """.stripMargin
+    """.stripMargin
     println(body)
     databricksPost("libraries/uninstall", body)
     ()
@@ -229,7 +225,7 @@ object DatabricksUtilities {
          |  },
          |  "libraries": $Libraries
          |}
-      """.stripMargin
+    """.stripMargin
     databricksPost("jobs/runs/submit", body).select[Int]("run_id")
   }
 
@@ -283,7 +279,7 @@ object DatabricksUtilities {
       val (url, nbName) = getRunUrlAndNBName(runId)
       if (logLevel >= 1) println(s"Started Monitoring notebook $nbName, url: $url")
 
-      while (finalState.isEmpty &  //scalastyle:ignore while
+      while (finalState.isEmpty & //scalastyle:ignore while
         (System.currentTimeMillis() - startTime) < timeout &
         lifeCycleState != "INTERNAL_ERROR"
       ) {
@@ -367,7 +363,7 @@ object DatabricksUtilities {
            |  "cluster_id":"$clusterId",
            |  "libraries": ${libraries.toJson.compactPrint}
            |}
-      """.stripMargin
+    """.stripMargin
       databricksPost("libraries/uninstall", body)
     }
     ()
@@ -378,7 +374,7 @@ object DatabricksUtilities {
   }
 }
 
-abstract class DatabricksTestHelper extends TestBase {
+abstract class DatabricksTestHelper extends NotebooksTestBase {
 
   import DatabricksUtilities._
 

@@ -115,59 +115,9 @@ jobs:
         PGP-PW: $(pgp-pw)
         SYNAPSEML_ENABLE_PUBLISH: true
 
-- job: E2E
-  timeoutInMinutes: 120
-  cancelTimeoutInMinutes: 0
-  pool:
-    vmImage: ubuntu-20.04
-  strategy:
-    matrix:
-      databricks-cpu:
-        TEST-CLASS: "com.microsoft.azure.synapse.ml.nbtest.DatabricksCPUTests"
-      databricks-gpu:
-        TEST-CLASS: "com.microsoft.azure.synapse.ml.nbtest.DatabricksGPUTests"
-      synapse:
-        TEST-CLASS: "com.microsoft.azure.synapse.ml.nbtest.SynapseTests"
-#      ${{ if eq(parameters.runSynapseExtensionE2ETests, true) }}:
-#        synapse-internal:
-#          TEST-CLASS: "com.microsoft.azure.synapse.ml.nbtest.SynapseExtension.SynapseExtensionsTests"
-  steps:
-    #- template: templates/ivy_cache.yml
-    - template: templates/update_cli.yml
-    - template: templates/conda.yml
-    - template: templates/kv.yml
-    - bash: |
-        set -e
-        source activate synapseml
-        sbt packagePython
-        sbt publishBlob
-      displayName: Publish Blob Artifacts
-      env:
-        STORAGE-KEY: $(storage-key)
-        NEXUS-UN: $(nexus-un)
-        NEXUS-PW: $(nexus-pw)
-        PGP-PRIVATE: $(pgp-private)
-        PGP-PUBLIC: $(pgp-public)
-        PGP-PW: $(pgp-pw)
-        SYNAPSEML_ENABLE_PUBLISH: true
-    - task: AzureCLI@2
-      displayName: 'E2E'
-      inputs:
-        azureSubscription:  'SynapseML Build'
-        scriptLocation: inlineScript
-        scriptType: bash
-        inlineScript: |
-          set -e
-          source activate synapseml
-          sbt "testOnly $(TEST-CLASS)"
-      condition: and(succeeded(), eq(variables.runTests, 'True'))
-    - task: PublishTestResults@2
-      displayName: 'Publish Test Results'
-      inputs:
-        testResultsFiles: '**/test-reports/TEST-*.xml'
-        failTaskOnFailedTests: true
-      condition: and(eq(variables.runTests, 'True'), succeededOrFailed())
-
+- template: templates/test_e2e.yml
+  parameters:
+    testConfigurationPath: notebooks/BaseTestConfiguration.json
 
 - job: PublishDocker
   displayName: PublishDocker

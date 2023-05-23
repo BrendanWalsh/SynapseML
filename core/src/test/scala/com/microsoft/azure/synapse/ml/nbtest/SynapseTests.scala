@@ -39,15 +39,12 @@ class SynapseTestCleanup extends TestBase {
 
 }
 
-class SynapseTests extends TestBase {
-  SharedNotebookE2ETestUtilities.generateNotebooks()
+class SynapseTests extends NotebooksTestBase {
+  SharedNotebookE2ETestUtilities.generateNotebooks(config.SynapseConfig.Notebooks.notebooks)
 
-  val selectedPythonFiles: Array[File] = FileUtilities.recursiveListFiles(SharedNotebookE2ETestUtilities.NotebooksDir)
+  val selectedPythonFiles: Array[File] = FileUtilities
+    .recursiveListFiles(SharedNotebookE2ETestUtilities.NotebooksOutputDir)
     .filter(_.getAbsolutePath.endsWith(".py"))
-    .filterNot(_.getAbsolutePath.contains("DeepLearningDeepTextClassification")) // Excluded by design task 1829306
-    .filterNot(_.getAbsolutePath.contains("DeepLearningDeepVisionClassification")) // Excluded by design task 1829306
-    .filterNot(_.getAbsolutePath.contains("VowpalWabbitClassificationusingVWnativeFormat"))
-    .filterNot(_.getAbsolutePath.contains("VowpalWabbitMulticlassclassification")) // Wait for Synpase fix
     .sortBy(_.getAbsolutePath)
 
   val expectedPoolCount: Int = selectedPythonFiles.length

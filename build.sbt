@@ -36,7 +36,9 @@ val extraDependencies = Seq(
   // Although breeze 1.2 is already provided by Spark, this is needed for Azure Synapse Spark 3.2 pools.
   // Otherwise a NoSuchMethodError will be thrown by interpretability code. This problem only happens
   // to Azure Synapse Spark 3.2 pools.
-  "org.scalanlp" %% "breeze" % "1.2"
+  "org.scalanlp" %% "breeze" % "1.2",
+  "com.github.pureconfig" %% "pureconfig" % "0.17.3",
+  "com.github.pureconfig" %% "pureconfig-yaml" % "0.17.3",
 ).map(d => d excludeAll (excludes: _*))
 val dependencies = coreDependencies ++ extraDependencies
 
@@ -479,12 +481,16 @@ setupTask := {
   getDatasetsTask.value
 }
 
-val convertNotebooks = TaskKey[Unit]("convertNotebooks", "convert notebooks to markdown for website display")
-convertNotebooks := {
+val installDocumentProjectionModule = TaskKey[Unit]("installDocumentProjectionModule", "Build and install the documentprojection python module locally")
+installDocumentProjectionModule := {
   runCmdStr("python -m pip uninstall -y documentprojection")
   runCmdStr("python -m build docs/python")
   runCmdStr("python -m pip install --find-links=docs/python/dist documentprojection")
-  runCmdStr("python -m documentprojection -r -p -c website . notebooks/features")
+}
+
+val convertNotebooks = TaskKey[Unit]("convertNotebooks", "convert notebooks to markdown for website display")
+convertNotebooks := {
+  runCmdStr("python -m docs.python.documentprojection -r --customchannels docs/python/synapseml_channels -c website . notebooks/features -p")
 }
 
 val testWebsiteDocs = TaskKey[Unit]("testWebsiteDocs",

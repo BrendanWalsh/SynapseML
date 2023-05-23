@@ -29,6 +29,6 @@ class ConsolePublisher(Publisher):
 
 
 class ConsoleChannel(Channel):
-    def __init__(self):
+    def __init__(self, _):
         self.formatter = ConsoleFormatter()
         self.publisher = ConsolePublisher()

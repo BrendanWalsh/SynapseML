@@ -3,7 +3,6 @@
 
 package com.microsoft.azure.synapse.ml.nbtest
 
-import com.microsoft.azure.synapse.ml.build.BuildInfo
 import com.microsoft.azure.synapse.ml.core.env.FileUtilities
 import org.apache.commons.io.FileUtils
 
@@ -14,29 +13,26 @@ import scala.sys.process._
 
 object SharedNotebookE2ETestUtilities {
   val ResourcesDirectory = new File(getClass.getResource("/").toURI)
-  val NotebooksDir = new File(ResourcesDirectory, "generated-notebooks")
+  val NotebooksOutputDir = new File(ResourcesDirectory, "generated-notebooks")
 
-  def generateNotebooks(): Unit = {
+  def generateNotebooks(notebooks: Seq[File]): Unit = {
     cleanUpGeneratedNotebooksDir()
 
-    FileUtilities.recursiveListFiles(FileUtilities
-      .join(BuildInfo.baseDirectory.getParent, "notebooks/features")
-      .getCanonicalFile)
-      .filter(_.getName.endsWith(".ipynb"))
+    notebooks
       .map { f =>
-        FileUtilities.copyFile(f, NotebooksDir, true)
-        val newFile = new File(NotebooksDir, f.getName)
-        val targetName = new File(NotebooksDir, f.getName.replace(" ", "").replace("-", ""))
+        FileUtilities.copyFile(f, NotebooksOutputDir, true)
+        val newFile = new File(NotebooksOutputDir, f.getName)
+        val targetName = new File(NotebooksOutputDir, f.getName.replace(" ", "").replace("-", ""))
         newFile.renameTo(targetName)
         targetName
       }
 
-    runCmd(activateCondaEnv ++ Seq("jupyter", "nbconvert", "--to", "python", "*.ipynb"), NotebooksDir)
+    runCmd(activateCondaEnv ++ Seq("jupyter", "nbconvert", "--to", "python", "*.ipynb"), NotebooksOutputDir)
   }
 
   def cleanUpGeneratedNotebooksDir(): Unit = {
-    FileUtils.deleteDirectory(NotebooksDir)
-    assert(NotebooksDir.mkdirs())
+    FileUtils.deleteDirectory(NotebooksOutputDir)
+    assert(NotebooksOutputDir.mkdirs())
   }
 
   def isWindows: Boolean = {

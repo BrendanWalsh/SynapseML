@@ -1,0 +1,92 @@
+{
+  "SynapseConfig": {
+    "Notebooks": {
+      "Paths": [
+        "notebooks/features"
+      ],
+      "Exclusions": [
+        "DeepLearningDeepTextClassification",
+        "DeepLearningDeepVisionClassification",
+        "VowpalWabbitClassificationusingVWnativeFormat",
+        "VowpalWabbitMulticlassclassification"
+      ]
+    }
+  },
+  "SynapseExtensionsConfig": {
+    "Notebooks": {
+      "Paths": [
+        "notebooks/extensions"
+      ],
+      "Exclusions": [
+        "EffectsOfOutreach",
+        "HyperParameterTuning",
+        "CyberML",
+        "VowpalWabbitOverview",
+        "VowpalWabbitClassificationusingVW",
+        "VowpalWabbitMulticlass",
+        "Interpretability",
+        "IsolationForest",
+        "ExplanationDashboard",
+        "DeepLearning",
+        "Cognitive",
+        "Geospatial",
+        "SentimentAnalysis",
+        "SparkServing",
+        "OpenCVPipelineImage"
+      ]
+    }
+  },
+  "DatabricksConfig": {
+    "ExecutionConfig": {
+      "TimeoutInMillis": 2400000
+    },
+    "SparkConfig": {
+      "Region": "eastus",
+      "NumWorkers": 5,
+      "AutoTerminationMinutes": 15,
+      "TokenRoot": "MML_ADB_TOKEN",
+      "AuthValueRoot": "Basic ",
+      "FolderRoot": "/SynapseMLBuild/build_"
+    },
+    "CPUConfig": {
+      "PoolName": "synapseml-build-10.4",
+      "AdbRuntime": "10.4.x-scala2.12",
+      "ClusterNameRoot": "mmlspark-build",
+      "PyPiLibraries": [
+        "nltk",
+        "bs4",
+        "plotly",
+        "Pillow",
+        "onnxmltools==1.7.0",
+        "lightgbm",
+        "mlflow",
+        "openai"
+      ],
+      "Notebooks": {
+        "Paths": [
+          "notebooks/features"
+        ],
+        "Exclusions": [
+          "simple_deep_learning"
+        ]
+      }
+    },
+    "GPUConfig": {
+      "PoolName": "synapseml-build-10.4-gpu",
+      "AdbRuntime": "10.4.x-gpu-ml-scala2.12",
+      "ClusterNameRoot": "mmlspark-build-gpu",
+      "PyPiLibraries": [
+        "transformers==4.15.0",
+        "petastorm==0.12.0"
+      ],
+      "InitScripts": [
+        "dbfs:/FileStore/horovod-fix-commit/horovod_installation.sh"
+      ],
+      "Notebooks": {
+        "Paths": [
+          "notebooks/features/simple_deep_learning"
+        ]
+      }
+    }
+  }
+}

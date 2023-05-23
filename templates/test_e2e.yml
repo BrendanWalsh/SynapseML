@@ -1,0 +1,68 @@
+parameters:
+  - name: testConfigurationPath
+    type: string
+    default: notebooks/BaseTestConfiguration.json
+  - name: runTests
+    type: boolean
+    default: true
+  - name: dependsOn
+    type: string
+    default: ""
+
+jobs:
+- job: E2E
+  dependsOn: ${{ parameters.dependsOn }}
+  timeoutInMinutes: 120
+  cancelTimeoutInMinutes: 0
+  pool:
+    vmImage: ubuntu-20.04
+  strategy:
+    matrix:
+      databricks-cpu:
+        TEST-CLASS: "com.microsoft.azure.synapse.ml.nbtest.DatabricksCPUTests"
+      databricks-gpu:
+        TEST-CLASS: "com.microsoft.azure.synapse.ml.nbtest.DatabricksGPUTests"
+      synapse:
+        TEST-CLASS: "com.microsoft.azure.synapse.ml.nbtest.SynapseTests"
+  steps:
+    - template: update_cli.yml
+    - template: conda.yml
+    - template: kv.yml
+    - bash: |
+        set -e
+        source activate synapseml
+        sbt packagePython
+        sbt publishBlob
+      displayName: Publish Blob Artifacts
+      env:
+        STORAGE-KEY: $(storage-key)
+        NEXUS-UN: $(nexus-un)
+        NEXUS-PW: $(nexus-pw)
+        PGP-PRIVATE: $(pgp-private)
+        PGP-PUBLIC: $(pgp-public)
+        PGP-PW: $(pgp-pw)
+        SYNAPSEML_ENABLE_PUBLISH: true
+        NOTEBOOK_TEST_CONFIG_OVERRIDE: ${{ parameters.testConfigurationPath }}
+    - task: AzureCLI@2
+      displayName: 'Run tests'
+      inputs:
+        azureSubscription:  'SynapseML Build'
+        scriptLocation: inlineScript
+        scriptType: bash
+        inlineScript: |
+          set -e
+          source activate synapseml
+          sbt "testOnly $(TEST-CLASS)"
+      condition: succeeded()
+    # - bash: |
+    #     set -e
+    #     source activate synapseml
+    #     sbt "testOnly $(TEST-CLASS)"
+    #   condition: succeeded()
+    #   displayName: Run tests
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results'
+      inputs:
+        testResultsFiles: '**/test-reports/TEST-*.xml'
+        failTaskOnFailedTests: true
+      condition: succeededOrFailed()

@@ -9,13 +9,13 @@ import breeze.math.Field
 import org.apache.commons.io.FileUtils
 import org.apache.spark._
 import org.apache.spark.ml._
-import org.apache.spark.sql.{DataFrame, _}
+import org.apache.spark.sql._
 import org.apache.spark.streaming.{StreamingContext, Seconds => SparkSeconds}
 import org.scalactic.Equality
 import org.scalactic.source.Position
 import org.scalatest._
-import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.concurrent.TimeLimits
+import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.time.{Seconds, Span}
 
 import java.io.File
@@ -154,7 +154,7 @@ abstract class TestBase extends AnyFunSuite with BeforeAndAfterEachTestData with
   private var tmpDirCreated = false
   protected lazy val tmpDir: Path = {
     tmpDirCreated = true
-    Files.createTempDirectory("MML-Test-")
+    Files.createTempDirectory("Spark-Test-")
   }
 
   // Timing info
