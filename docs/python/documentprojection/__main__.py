@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from .utils.manifest import parse_manifest
 from .utils.reflection import *
 from .utils.logging import *
 from .utils.notebook import *
@@ -23,6 +24,7 @@ def get_channel_map(custom_channels_folder, cwd):
     channels = default_channels.copy()
     if custom_channels_folder is not None and len(custom_channels_folder) > 0:
         channels.extend(get_channels_from_dir(custom_channels_folder, cwd))
+    log.info(f"All channels: {channels}")
 
     channel_map = {
         k: v
@@ -47,11 +49,11 @@ def parse_args():
         default=".",
     )
     parser.add_argument(
-        "notebooks",
-        metavar="N",
+        "manifest",
+        metavar="MANIFEST",
         type=str,
-        nargs="*",
         help="a notebook or folder of notebooks to project",
+        default="docs/manifest.yaml",
     )
     parser.add_argument(
         "-f", "--format", action="store_true", default=False, help="run only formatters"
@@ -62,23 +64,6 @@ def parse_args():
         action="store_true",
         default=False,
         help="run publishers. forces -t and -f.",
-    )
-    parser.add_argument(
-        "-m",
-        "--metadata",
-        action="store_true",
-        default=False,
-        help="format documents and only output metadata of formated documents.",
-    )
-    parser.add_argument(
-        "-r",
-        "--recursive",
-        action="store_true",
-        default=False,
-        help="recursively scan for notebooks in the given directory.",
-    )
-    parser.add_argument(
-        "-l", "--list", action="store_true", default=False, help="list notebooks"
     )
     parser.add_argument(
         "-c",
@@ -110,30 +95,18 @@ def run():
 
     args.project_root = os.path.abspath(args.project_root)
 
-    if len(args.notebooks) == 0:
-        log.warn("No notebooks specified. Using sample notebook.")
-        args.notebooks = [get_mock_path()]
+    if args.manifest is not None:
+        import json
 
-    notebooks = collect_notebooks(args.notebooks, args.recursive)
-    if args.list:
-        log.info("Notebooks found:\n{}".format("\n".join(map(repr, notebooks))))
-        log.info("--info specified. Will not process any notebooks.")
-        return
-    log.debug("notebooks specified: {}".format(notebooks))
+        log.info(f"Reading manifest file: {args.manifest}.")
+        args.manifest = parse_manifest(args.manifest)
+        log.debug(f"Manifest:\n{json.dumps(args.manifest, indent=4, sort_keys=True)}")
 
-    pipeline = DocumentProjectionPipeline(config=PipelineConfig(vars(args)))
-    channels = []
     channel_map = get_channel_map(args.customchannels, args.project_root)
-    for channel in args.channels.split(","):
-        if channel not in channel_map:
-            log.critical(
-                f"Channel '{channel}' not found. If this is a custom channel, make sure it is in the custom channels folder and that the folder is specified with the --customchannels argument."
-            )
-            return
-
-        channels.append(channel_map[channel])
-    pipeline.register_channels(channels)
-    pipeline.run(notebooks)
+    pipeline = DocumentProjectionPipeline(
+        channel_map, config=PipelineConfig(vars(args))
+    )
+    pipeline.run()
 
 
 run()

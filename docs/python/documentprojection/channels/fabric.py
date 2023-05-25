@@ -4,34 +4,31 @@ from ..framework.markdown import MarkdownFormatter
 
 log = get_log(__name__)
 
-# A sample Console (no-operation) channel that 'publishes' to the console. Useful for testing.
-class ConsoleDoc(Document):
+# A sample Fabric (no-operation) channel that 'publishes' to the Fabric. Useful for testing.
+class FabricDoc(Document):
     def __init__(self, content, metadata):
         self.content = content
         self.metadata = metadata
 
 
-class ConsoleFormatter(MarkdownFormatter):
+class FabricFormatter(MarkdownFormatter):
     def clean_markdown(self, markdown: str) -> str:
         return markdown
 
     def get_header(self, notebook: Notebook) -> str:
-        return "This is a test header injected by the 'console' formatter."
+        return "This is a test header injected by the 'Fabric' formatter."
 
     def get_metadata(self, notebook: Notebook) -> dict:
-        notebook.metadata.update(
-            {"source_path": notebook.path, "target_path": "stdout"}
-        )
-        return notebook.metadata
+        return {"source_path": notebook.path, "target_path": "stdout"}
 
 
-class ConsolePublisher(Publisher):
+class FabricPublisher(Publisher):
     def publish(self, document: Document) -> bool:
         print(document.content)
         return True
 
 
-class ConsoleChannel(Channel):
+class FabricChannel(Channel):
     def __init__(self, _):
-        self.formatter = ConsoleFormatter()
-        self.publisher = ConsolePublisher()
+        self.formatter = FabricFormatter()
+        self.publisher = FabricPublisher()

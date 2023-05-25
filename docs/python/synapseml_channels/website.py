@@ -23,7 +23,7 @@ class WebsiteDoc(Document):
 
 
 class WebsiteFormatter(MarkdownFormatter):
-    def __init__(self, config: ChannelConfig):
+    def __init__(self, config: ChannelMetadata):
         self.config = config
 
     def clean_markdown(self, markdown: str) -> str:
@@ -62,6 +62,6 @@ class WebsitePublisher(Publisher):
 
 
 class WebsiteChannel(Channel):
-    def __init__(self, config: ChannelConfig):
+    def __init__(self, config: ChannelMetadata):
         self.formatter = WebsiteFormatter(config)
         self.publisher = WebsitePublisher()

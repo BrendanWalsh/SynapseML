@@ -23,6 +23,7 @@ dependencies:
     - pytest-cov
     - nbconvert
     - nbformat
+    - pyyaml
     - PyGithub
     - tqdm
     - build
