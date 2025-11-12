@@ -13,7 +13,7 @@ import org.apache.spark.sql.types._
 
 trait OptimizedCKNNFitting extends ConditionalKNNParams with SynapseMLLogging {
 
-  private def fitGeneric[V, L](dataset: Dataset[_]): ConditionalKNNModel = {
+  private def fitGeneric[V: scala.reflect.ClassTag, L: scala.reflect.ClassTag](dataset: Dataset[_]): ConditionalKNNModel = {
 
     val kvlTriples = dataset.toDF().select(getFeaturesCol, getValuesCol, getLabelCol).collect()
       .map { row =>
@@ -35,22 +35,14 @@ trait OptimizedCKNNFitting extends ConditionalKNNParams with SynapseMLLogging {
   }
 
   protected def fitOptimized(dataset: Dataset[_]): ConditionalKNNModel = {
-
-    val vt = PhysicalDataType.apply(dataset.schema(getValuesCol).dataType)
-    val lt = PhysicalDataType.apply(dataset.schema(getLabelCol).dataType)
-    (vt, lt) match {
-      case (avt: PhysicalDataType, alt: PhysicalDataType) => fitGeneric[avt.InternalType, alt.InternalType](dataset)
-      case (avt: PhysicalDataType, _) => fitGeneric[avt.InternalType, Any](dataset)
-      case (_, alt: PhysicalDataType) => fitGeneric[Any, alt.InternalType](dataset)
-      case _ => fitGeneric[Any, Any](dataset)
-    }
+    fitGeneric[Any, Any](dataset)
   }
 
 }
 
 trait OptimizedKNNFitting extends KNNParams with SynapseMLLogging {
 
-  private def fitGeneric[V](dataset: Dataset[_]): KNNModel = {
+  private def fitGeneric[V: scala.reflect.ClassTag](dataset: Dataset[_]): KNNModel = {
 
     val kvlTuples = dataset.toDF().select(getFeaturesCol, getValuesCol).collect()
       .map { row =>
@@ -69,11 +61,7 @@ trait OptimizedKNNFitting extends KNNParams with SynapseMLLogging {
   }
 
   protected def fitOptimized(dataset: Dataset[_]): KNNModel = {
-
-    PhysicalDataType.apply(dataset.schema(getValuesCol).dataType) match {
-      case avt: PhysicalDataType => fitGeneric[avt.InternalType](dataset)
-      case _ => fitGeneric[Any](dataset)
-    }
+    fitGeneric[Any](dataset)
   }
 
 }

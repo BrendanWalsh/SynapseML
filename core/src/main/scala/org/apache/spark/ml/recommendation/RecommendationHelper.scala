@@ -199,7 +199,7 @@ object SparkHelpers {
 
   def flatten(ratings: Dataset[_], num: Int, dstOutputColumn: String, srcOutputColumn: String): DataFrame = {
     import ratings.sparkSession.implicits._
-    import org.apache.spark.sql.functions.{collect_top_k, struct}
+    import org.apache.spark.sql.functions.{collect_list, struct, sort_array, slice}
 
     val arrayType = ArrayType(
       new StructType()
@@ -207,12 +207,18 @@ object SparkHelpers {
         .add(Constants.RatingCol, FloatType)
     )
 
-    ratings.toDF(srcOutputColumn, dstOutputColumn, Constants.RatingCol).groupBy(srcOutputColumn)
-     .agg(collect_top_k(struct(Constants.RatingCol, dstOutputColumn), num, false))
-     .as[(Int, Seq[(Float, Int)])]
-     .map(t => (t._1, t._2.map(p => (p._2, p._1))))
-     .toDF(srcOutputColumn, Constants.Recommendations)
-     .withColumn(Constants.Recommendations, col(Constants.Recommendations).cast(arrayType))
+    ratings.toDF(srcOutputColumn, dstOutputColumn, Constants.RatingCol)
+      .groupBy(srcOutputColumn)
+      .agg(
+        slice(
+          sort_array(collect_list(struct(col(Constants.RatingCol), col(dstOutputColumn))), asc = false),
+          1, num
+        ).alias("topk")
+      )
+      .as[(Int, Seq[(Float, Int)])]
+      .map { case (id, seq) => (id, seq.map { case (rating, item) => (item, rating) }) }
+      .toDF(srcOutputColumn, Constants.Recommendations)
+      .withColumn(Constants.Recommendations, col(Constants.Recommendations).cast(arrayType))
   }
 }
 

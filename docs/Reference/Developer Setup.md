@@ -7,8 +7,8 @@ description: Developer Setup
 
 # SynapseML Development Setup
 
-1. [Install JDK 11](https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html)
-    - You may need an Oracle login to download.
+1. Install JDK 17 (Spark 4.0 requires Java 17)
+    - Use your preferred distribution (Adoptium Temurin, Oracle, etc.). Ensure `JAVA_HOME` points to JDK 17.
 1. [Install SBT](https://www.scala-sbt.org/1.x/docs/Setup.html)
 1. Fork the repository on GitHub
     - See how to here: [Fork a repo - GitHub Docs](https://docs.github.com/en/get-started/quickstart/fork-a-repo)

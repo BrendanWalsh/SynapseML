@@ -31,11 +31,13 @@ object ServiceParamJsonProtocol extends DefaultJsonProtocol {
   // scalastyle:on cyclomatic.complexity
 }
 
+import scala.reflect.ClassTag
+
 class JsonEncodableParam[T](parent: Params, name: String, doc: String, isValid: T => Boolean)
-                           (@transient implicit val format: JsonFormat[T])
+                           (@transient implicit val format: JsonFormat[T], @transient implicit val ct: ClassTag[T])
   extends Param[T](parent, name, doc, isValid) {
 
-  def this(parent: Params, name: String, doc: String)(implicit format: JsonFormat[T]) =
+  def this(parent: Params, name: String, doc: String)(implicit format: JsonFormat[T], ct: ClassTag[T]) =
     this(parent, name, doc, (_: T) => true)
 
   override def jsonEncode(value: T): String = {
@@ -81,7 +83,7 @@ object ServiceParam {
   }
 }
 
-class ServiceParam[T: TypeTag](parent: Params,
+class ServiceParam[T: TypeTag : ClassTag](parent: Params,
                                name: String,
                                doc: String,
                                isValid: Either[T, String] => Boolean = (_: Either[T, String]) => true,
@@ -129,7 +131,7 @@ class ServiceParam[T: TypeTag](parent: Params,
 }
 
 // Use this class if you want to extend JsonEncodableParam for Cognitive services param
-class CognitiveServiceStructParam[T: TypeTag](parent: Params,
+class CognitiveServiceStructParam[T: TypeTag : ClassTag](parent: Params,
                                               name: String,
                                               doc: String,
                                               isValid: T => Boolean = (_: T) => true)

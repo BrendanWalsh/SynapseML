@@ -166,7 +166,7 @@ trait LightGBMBase[TrainedModel <: Model[TrainedModel] with LightGBMModelParams]
     */
   protected def getCategoricalIndexes(featuresSchema: StructField): Array[Int] = {
     val categoricalColumnSlotNames = get(categoricalSlotNames).getOrElse(Array.empty[String])
-    val categoricalIndexes = if (getSlotNames.nonEmpty) {
+    val categoricalIndexes: Array[Int] = if (getSlotNames.nonEmpty) {
       categoricalColumnSlotNames.map(getSlotNames.indexOf(_))
     } else {
       val categoricalSlotNamesSet = HashSet(categoricalColumnSlotNames: _*)
@@ -190,11 +190,13 @@ trait LightGBMBase[TrainedModel <: Model[TrainedModel] with LightGBMModelParams]
             }
         }
       }
-    }
+    }.toArray
 
     get(categoricalSlotIndexes)
       .getOrElse(Array.empty[Int])
-      .union(categoricalIndexes).distinct
+      .union(categoricalIndexes)
+      .distinct
+      .toArray
   }
 
   private def getSlotNamesWithMetadata(featuresSchema: StructField): Option[Array[String]] = {

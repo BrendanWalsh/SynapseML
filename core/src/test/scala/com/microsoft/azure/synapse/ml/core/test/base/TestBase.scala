@@ -48,6 +48,7 @@ trait SparkSessionManagement {
     new SparkConf()
       .set("spark.logConf", "true")
       .set("spark.sql.shuffle.partitions", "20")
+      .set("spark.sql.ansi.enabled", "false")
       .set("spark.driver.maxResultSize", "6g")
       .set("spark.sql.crossJoin.enabled", "true")
       .set("spark.sql.warehouse.dir", localWarehousePath)

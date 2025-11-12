@@ -99,9 +99,10 @@ object RTestGen {
          |  "spark.jars.repositories=$SparkMavenRepositoryList",
          |  "spark.executor.heartbeatInterval=60s",
          |  "spark.sql.shuffle.partitions=10",
+         |  "spark.sql.ansi.enabled=false",
          |  "spark.sql.crossJoin.enabled=true")
          |
-         |sc <- spark_connect(master = "local", version = "3.5.0", config = conf)
+         |sc <- spark_connect(master = "local", version = "4.0.0", config = conf)
          |
          |""".stripMargin, StandardOpenOption.CREATE)
 

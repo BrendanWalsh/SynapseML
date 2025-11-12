@@ -14,6 +14,7 @@ import org.apache.spark.ml.{ComplexParamsReadable, linalg}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, Row}
+import scala.collection.parallel.CollectionConverters._
 
 class TabularLIME(override val uid: String)
   extends LIMEBase(uid)
