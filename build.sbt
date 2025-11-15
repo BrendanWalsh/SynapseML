@@ -35,10 +35,12 @@ val extraDependencies = Seq(
   "com.jcraft" % "jsch" % "0.1.54",
   "org.apache.httpcomponents.client5" % "httpclient5" % "5.1.3",
   "org.apache.httpcomponents" % "httpmime" % "4.5.13",
-  "com.linkedin.isolation-forest" %% "isolation-forest_3.5.0" % "3.0.5"
-    exclude("com.google.protobuf", "protobuf-java") exclude("org.apache.spark", s"spark-mllib_$scalaMajorVersion")
-    exclude("org.apache.spark", s"spark-core_$scalaMajorVersion") exclude("org.apache.spark", s"spark-avro_$scalaMajorVersion")
-    exclude("org.apache.spark", s"spark-sql_$scalaMajorVersion"),
+  "com.linkedin.isolation-forest" %% "isolation-forest_4.0.1" % "4.0.7"
+    exclude("com.google.protobuf", "protobuf-java")
+    .exclude("org.apache.spark", s"spark-mllib_$scalaMajorVersion")
+    .exclude("org.apache.spark", s"spark-core_$scalaMajorVersion")
+    .exclude("org.apache.spark", s"spark-avro_$scalaMajorVersion")
+    .exclude("org.apache.spark", s"spark-sql_$scalaMajorVersion"),
 ).map(d => d excludeAll (excludes: _*))
 val dependencies = coreDependencies ++ extraDependencies
 
@@ -111,7 +113,9 @@ rootGenDir := {
 }
 
 // Projects enabled for Spark 4.0 packaging (deepLearning temporarily excluded)
-lazy val enabledProjects = Seq(core, cognitive, vw, lightgbm, opencv)
+import sbt.{LocalProject, ProjectReference}
+lazy val enabledProjects: Seq[ProjectReference] =
+  Seq("core", "cognitive", "vw", "lightgbm", "opencv").map(LocalProject.apply)
 
 def runTaskForAllInCompile(task: TaskKey[Unit]): Def.Initialize[Task[Seq[Unit]]] = {
   task.all(ScopeFilter(

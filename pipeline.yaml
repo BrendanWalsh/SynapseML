@@ -71,6 +71,12 @@ jobs:
   pool:
     vmImage: $(UBUNTU_VERSION)
   steps:
+    - task: JavaToolInstaller@0
+      displayName: 'Use Java 17'
+      inputs:
+        versionSpec: '17'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
     - task: AzureCLI@2
       displayName: 'Scala Style Check'
       inputs:
@@ -91,6 +97,12 @@ jobs:
   pool:
     vmImage: $(UBUNTU_VERSION)
   steps:
+    - task: JavaToolInstaller@0
+      displayName: 'Use Java 17'
+      inputs:
+        versionSpec: '17'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
     #- template: templates/ivy_cache.yml
     - template: templates/update_cli.yml
     - template: templates/conda.yml
@@ -103,6 +115,7 @@ jobs:
         mavenServiceConnections: SynapseML_PublicPackages-Feed-Connection
     - task: AzureCLI@2
       displayName: 'Publish Artifacts'
+      condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')
       inputs:
         azureSubscription: 'SynapseML Build'
         scriptLocation: inlineScript
@@ -124,6 +137,7 @@ jobs:
         PGP-PUBLIC: $(pgp-public)
         PGP-PW: $(pgp-pw)
         SYNAPSEML_ENABLE_PUBLISH: true
+        SYNAPSEML_SKIP_WEBSITE_DOCTESTS: true
     - task: AzureCLI@2
       inputs:
         azureSubscription: 'SynapseML Build'
@@ -142,6 +156,13 @@ jobs:
   cancelTimeoutInMinutes: 0
   pool:
     vmImage: $(UBUNTU_VERSION)
+  steps:
+    - task: JavaToolInstaller@0
+      displayName: 'Use Java 17'
+      inputs:
+        versionSpec: '17'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
   strategy:
     matrix:
       databricks-cpu:
@@ -366,20 +387,19 @@ jobs:
     matrix:
       core:
         PACKAGE: "core"
-      deep-learning-hf:
-        PACKAGE: "deepLearning"
-        TEST_SUB_PATH: "hf"
-        IGNORE_TEST_PATH: ""
-      deep-learning-nohf:
-        PACKAGE: "deepLearning"
-        TEST_SUB_PATH: ""
-        IGNORE_TEST_PATH: "hf"
       lightgbm:
         PACKAGE: "lightgbm"
       opencv:
         PACKAGE: "opencv"
       vw:
         PACKAGE: "vw"
+  steps:
+    - task: JavaToolInstaller@0
+      displayName: 'Use Java 17'
+      inputs:
+        versionSpec: '17'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
       cognitive:
         PACKAGE: "cognitive"
   steps:

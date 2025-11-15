@@ -91,3 +91,6 @@ metastore_db/
 *_local\.*
 condaenv.*.requirements.txt
 *.env
+
+# AI
+Agents.md
