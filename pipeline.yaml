@@ -156,13 +156,6 @@ jobs:
   cancelTimeoutInMinutes: 0
   pool:
     vmImage: $(UBUNTU_VERSION)
-  steps:
-    - task: JavaToolInstaller@0
-      displayName: 'Use Java 17'
-      inputs:
-        versionSpec: '17'
-        jdkArchitectureOption: 'x64'
-        jdkSourceOption: 'PreInstalled'
   strategy:
     matrix:
       databricks-cpu:
@@ -180,6 +173,12 @@ jobs:
 #        synapse-internal:
 #          TEST-CLASS: "com.microsoft.azure.synapse.ml.nbtest.SynapseExtension.SynapseExtensionsTests"
   steps:
+    - task: JavaToolInstaller@0
+      displayName: 'Use Java 17'
+      inputs:
+        versionSpec: '17'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
     #- template: templates/ivy_cache.yml
     - template: templates/update_cli.yml
     - template: templates/conda.yml
@@ -387,6 +386,8 @@ jobs:
     matrix:
       core:
         PACKAGE: "core"
+      cognitive:
+        PACKAGE: "cognitive"
       lightgbm:
         PACKAGE: "lightgbm"
       opencv:
@@ -400,9 +401,7 @@ jobs:
         versionSpec: '17'
         jdkArchitectureOption: 'x64'
         jdkSourceOption: 'PreInstalled'
-      cognitive:
-        PACKAGE: "cognitive"
-  steps:
+    #- template: templates/ivy_cache.yml
     #- template: templates/ivy_cache.yml
     - template: templates/update_cli.yml
     - template: templates/conda.yml
