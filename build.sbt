@@ -22,7 +22,7 @@ val excludes = Seq(
 
 val coreDependencies = Seq(
   // Excluding protobuf-java, as spark-core is bringing the older version transitively.
-  "org.apache.spark" %% "spark-core" % sparkVersion % "compile" exclude("com.google.protobuf", "protobuf-java"),
+  "org.apache.spark" %% "spark-core" % sparkVersion % "compile" .exclude("com.google.protobuf", "protobuf-java"),
   "org.apache.spark" %% "spark-mllib" % sparkVersion % "compile",
   "org.apache.spark" %% "spark-avro" % sparkVersion % "compile",
   "org.apache.spark" %% "spark-tags" % sparkVersion % "test",
@@ -36,7 +36,7 @@ val extraDependencies = Seq(
   "org.apache.httpcomponents.client5" % "httpclient5" % "5.1.3",
   "org.apache.httpcomponents" % "httpmime" % "4.5.13",
   "com.linkedin.isolation-forest" %% "isolation-forest_4.0.1" % "4.0.7"
-    exclude("com.google.protobuf", "protobuf-java")
+    .exclude("com.google.protobuf", "protobuf-java")
     .exclude("org.apache.spark", s"spark-mllib_$scalaMajorVersion")
     .exclude("org.apache.spark", s"spark-core_$scalaMajorVersion")
     .exclude("org.apache.spark", s"spark-avro_$scalaMajorVersion")
