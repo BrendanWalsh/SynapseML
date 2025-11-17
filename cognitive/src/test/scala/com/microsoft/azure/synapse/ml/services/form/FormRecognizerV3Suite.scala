@@ -10,8 +10,6 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, Row}
 import org.scalactic.Equality
 
-import scala.collection.immutable.HashMap
-
 trait FormRecognizerV3Utils extends TestBase {
   def layoutTest(model: AnalyzeDocument, df: DataFrame): DataFrame = {
     model.transform(df)
@@ -33,8 +31,12 @@ trait FormRecognizerV3Utils extends TestBase {
 
   def resultAssert(result: Array[Row], str1: String, str2: String): Unit = {
     assert(result.head.getString(2).contains(str1))
-    assert(result.head.getSeq(3).head.asInstanceOf[HashMap.HashTrieMap[String, _]]
-      .keys.toSeq.sortWith(_ < _).mkString(",").contains(str2))
+    val firstFieldKeys = result.head.getSeq[Any](3).headOption match {
+      case Some(map: collection.Map[_, _]) =>
+        map.keysIterator.map(_.toString).toSeq.sorted.mkString(",")
+      case _ => ""
+    }
+    assert(firstFieldKeys.contains(str2))
   }
 
   def documentTest(model: AnalyzeDocument, df: DataFrame): DataFrame = {

@@ -17,7 +17,7 @@ import spray.json._
 
 import java.io.BufferedInputStream
 import java.net.URL
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.duration.Duration
 
 case class ONNXShape(name: String, shape: Seq[Either[Option[String], Int]], `type`: Option[String])

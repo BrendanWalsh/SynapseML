@@ -22,7 +22,8 @@ val excludes = Seq(
 
 val coreDependencies = Seq(
   // Excluding protobuf-java, as spark-core is bringing the older version transitively.
-  "org.apache.spark" %% "spark-core" % sparkVersion % "compile" .exclude("com.google.protobuf", "protobuf-java"),
+  ("org.apache.spark" %% "spark-core" % sparkVersion % "compile")
+    .exclude("com.google.protobuf", "protobuf-java"),
   "org.apache.spark" %% "spark-mllib" % sparkVersion % "compile",
   "org.apache.spark" %% "spark-avro" % sparkVersion % "compile",
   "org.apache.spark" %% "spark-tags" % sparkVersion % "test",
@@ -35,7 +36,7 @@ val extraDependencies = Seq(
   "com.jcraft" % "jsch" % "0.1.54",
   "org.apache.httpcomponents.client5" % "httpclient5" % "5.1.3",
   "org.apache.httpcomponents" % "httpmime" % "4.5.13",
-  "com.linkedin.isolation-forest" %% "isolation-forest_4.0.1" % "4.0.7"
+  ("com.linkedin.isolation-forest" %% "isolation-forest_4.0.1" % "4.0.7")
     .exclude("com.google.protobuf", "protobuf-java")
     .exclude("org.apache.spark", s"spark-mllib_$scalaMajorVersion")
     .exclude("org.apache.spark", s"spark-core_$scalaMajorVersion")
@@ -112,10 +113,10 @@ rootGenDir := {
   join(targetDir, "generated")
 }
 
-// Projects enabled for Spark 4.0 packaging (deepLearning temporarily excluded)
+// Projects enabled for Spark 4.0 packaging
 import sbt.{LocalProject, ProjectReference}
 lazy val enabledProjects: Seq[ProjectReference] =
-  Seq("core", "cognitive", "vw", "lightgbm", "opencv").map(LocalProject.apply)
+  Seq("core", "cognitive", "vw", "lightgbm", "opencv", "deepLearning").map(LocalProject.apply)
 
 def runTaskForAllInCompile(task: TaskKey[Unit]): Def.Initialize[Task[Seq[Unit]]] = {
   task.all(ScopeFilter(
@@ -294,6 +295,7 @@ lazy val deepLearning = (project in file("deep-learning"))
   .settings(settings ++ Seq(
     libraryDependencies ++= Seq(
       "com.microsoft.onnxruntime" % "onnxruntime_gpu" % "1.8.1",
+      "com.microsoft.azure" % s"onnx-protobuf_$scalaMajorVersion" % "0.9.24",
       "org.apache.hadoop" % "hadoop-common" % "3.3.4" % "test",
       "org.apache.hadoop" % "hadoop-azure" % "3.3.4" % "test",
     ),
@@ -333,13 +335,14 @@ lazy val opencv = (project in file("opencv"))
   ): _*)
 
 lazy val root = (project in file("."))
-  .aggregate(core, cognitive, vw, lightgbm, opencv)
+  .aggregate(core, cognitive, vw, lightgbm, opencv, deepLearning)
   .dependsOn(
     core % "test->test;compile->compile",
     cognitive % "test->test;compile->compile",
     vw % "test->test;compile->compile",
     lightgbm % "test->test;compile->compile",
-    opencv % "test->test;compile->compile")
+    opencv % "test->test;compile->compile",
+    deepLearning % "test->test;compile->compile")
   .enablePlugins(ScalaUnidocPlugin)
   .disablePlugins(CodegenPlugin)
   .settings(settings ++ Seq(
@@ -354,7 +357,7 @@ lazy val root = (project in file("."))
 val setupTask = TaskKey[Unit]("setup", "set up library for intellij")
 setupTask := {
   compile.all(ScopeFilter(
-    inProjects(root, core, cognitive, vw, lightgbm, opencv),
+    inProjects(root, core, cognitive, vw, lightgbm, opencv, deepLearning),
     inConfigurations(Compile, Test))
   ).value
   getDatasetsTask.value

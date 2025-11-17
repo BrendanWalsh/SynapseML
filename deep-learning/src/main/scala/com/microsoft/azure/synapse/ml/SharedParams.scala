@@ -6,7 +6,7 @@ package com.microsoft.azure.synapse.ml
 import com.microsoft.azure.synapse.ml.param.StringStringMapParam
 import org.apache.spark.ml.param.Params
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 trait HasFeedFetchDicts extends Params {
   val feedDict: StringStringMapParam = new StringStringMapParam(

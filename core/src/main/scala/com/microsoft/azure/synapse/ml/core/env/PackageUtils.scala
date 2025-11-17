@@ -27,12 +27,13 @@ object PackageUtils {
   // If testing onnx package with snapshots repo, make sure to switch to using
   // OnnxProtobufRepository = SonatypeSnapshotsRepository and also adding it to SparkMavenRepositoryList
   private val OnnxProtobufPackageName = s"onnx-protobuf_$ScalaVersionSuffix"
-  private val OnnxProtobufVersion = "0.9.1"
+  private val OnnxProtobufVersion = "0.9.24"
   private val OnnxProtobufMavenCoordinate = s"$PackageGroup:$OnnxProtobufPackageName:$OnnxProtobufVersion"
   private val OnnxProtobufRepository: String = SparkMLRepository
 
   // Note: this is also hardwired in website/doctest.py
   // val SparkMavenPackageList = s"$PackageMavenCoordinate"
-  val SparkMavenPackageList = Array(PackageMavenCoordinate, AvroCoordinate).mkString(",")
+  val SparkMavenPackageList =
+    Array(PackageMavenCoordinate, AvroCoordinate, OnnxProtobufMavenCoordinate).mkString(",")
   val SparkMavenRepositoryList = s"$PackageRepository"
 }

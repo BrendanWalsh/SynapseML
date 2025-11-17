@@ -223,12 +223,20 @@ class VerifyTrainClassifier extends Benchmarks with EstimatorFuzzing[TrainClassi
       if (!includeNonProb) List(gbtName, mlpName) else Nil)
       .flatten.toSet
 
-    Map(lrName -> createLR, dtName -> createDT,
-      gbtName -> createGBT, rfName -> createRF,
-      mlpName -> createMLP, nbName -> createNB)
-      .mapValues(creator => creator.setLabelCol(labelColumnName))
-      .filterKeys(!modelsToExclude(_))
-      .mapValues(trainScoreDataset(labelColumnName, dataset, _))
+    val creators = Map(
+      lrName -> createLR,
+      dtName -> createDT,
+      gbtName -> createGBT,
+      rfName -> createRF,
+      mlpName -> createMLP,
+      nbName -> createNB
+    )
+
+    creators
+      .map { case (name, creator) => name -> creator.setLabelCol(labelColumnName) }
+      .filterNot { case (name, _) => modelsToExclude(name) }
+      .map { case (name, estimator) => name -> trainScoreDataset(labelColumnName, dataset, estimator) }
+      .toMap
   }
 
   /** Get the auc and area over PR for the scored dataset.
