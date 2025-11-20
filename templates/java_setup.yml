@@ -1,5 +1,5 @@
 steps:
-  - task: UseJavaVersion@1
+  - task: JavaToolInstaller@0
     displayName: 'Use Java 17'
     inputs:
       versionSpec: '17'
