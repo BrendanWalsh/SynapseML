@@ -13,10 +13,10 @@ import org.apache.spark.sql.types._
 import java.nio._
 import java.util
 import scala.annotation.tailrec
-import scala.collection.JavaConverters._
+
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
-import scala.jdk.CollectionConverters.mapAsScalaMapConverter
+import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
 
 object ONNXUtils {
@@ -85,10 +85,10 @@ object ONNXUtils {
           value.getValue.asInstanceOf[java.util.List[java.util.Map[_, _]]]
             .asScala.toArray.map(_.asScala.toMap)
         } else {
-          value.getValue.asInstanceOf[java.util.List[_]].asScala
+          value.getValue.asInstanceOf[java.util.List[_]].asScala.toSeq
         }
       case _: MapInfo =>
-        Array(value.getValue.asInstanceOf[java.util.Map[_, _]].asScala.toMap)
+        Seq(value.getValue.asInstanceOf[java.util.Map[_, _]].asScala.toMap)
     }
   }
 

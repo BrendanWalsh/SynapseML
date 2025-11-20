@@ -7,12 +7,12 @@ import scala.xml.transform.{RewriteRule, RuleTransformer}
 import scala.xml.{Node => XmlNode, NodeSeq => XmlNodeSeq, _}
 
 val condaEnvName = "synapseml"
-val sparkVersion = "3.5.0"
+val sparkVersion = "4.0.1"
 name := "synapseml"
 ThisBuild / organization := "com.microsoft.azure"
-ThisBuild / scalaVersion := "2.12.17"
+ThisBuild / scalaVersion := "2.13.16"
 
-val scalaMajorVersion = 2.12
+val scalaMajorVersion = 2.13
 
 val excludes = Seq(
   ExclusionRule("org.apache.spark", s"spark-tags_$scalaMajorVersion"),
@@ -252,6 +252,23 @@ val settings = Seq(
   Test / logBuffered := false,
   Test / parallelExecution := false,
   Test / publishArtifact := true,
+  Test / fork := true,
+  Test / javaOptions ++= Seq(
+    "--add-opens=java.base/java.lang=ALL-UNNAMED",
+    "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED",
+    "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+    "--add-opens=java.base/java.io=ALL-UNNAMED",
+    "--add-opens=java.base/java.net=ALL-UNNAMED",
+    "--add-opens=java.base/java.nio=ALL-UNNAMED",
+    "--add-opens=java.base/java.util=ALL-UNNAMED",
+    "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED",
+    "--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED",
+    "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED",
+    "--add-opens=java.base/sun.nio.cs=ALL-UNNAMED",
+    "--add-opens=java.base/sun.security.action=ALL-UNNAMED",
+    "--add-opens=java.base/sun.util.calendar=ALL-UNNAMED",
+    "--add-opens=java.security.jgss/sun.security.krb5=ALL-UNNAMED"
+  ),
   assembly / test := {},
   assembly / assemblyMergeStrategy := {
     case PathList("META-INF", xs@_*) => MergeStrategy.discard
