@@ -3,10 +3,6 @@ steps:
     inputs:
       versionSpec: '3.8'
       architecture: 'x64'
-  - task: JavaToolInstaller@0
-    inputs:
-      versionSpec: '8'
-      jdkArchitectureOption: 'x64'
-      jdkSourceOption: 'PreInstalled'
+  - template: java_setup.yml
   - bash: pip install azure-cli==2.60.0
     displayName: 'Upgrade Azure CLI'

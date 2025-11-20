@@ -69,6 +69,7 @@ jobs:
   pool:
     vmImage: $(UBUNTU_VERSION)
   steps:
+    - template: templates/java_setup.yml
     - task: AzureCLI@2
       displayName: 'Scala Style Check'
       inputs:
