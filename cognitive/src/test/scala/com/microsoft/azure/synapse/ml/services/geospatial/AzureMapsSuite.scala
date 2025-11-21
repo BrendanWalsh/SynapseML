@@ -239,10 +239,15 @@ class AzMapsPointInPolygonSuite extends TransformerFuzzing[CheckPointInPolygon] 
 
     tryWithRetries(Array(3000, 5000, 10000, 20000, 30000)) { () =>
       val getLongRunningResult = new HttpGet(new URI(locationUrl + "&" + queryParams))
-      val resourceLocation = RESTHelpers.sendAndParseJson(getLongRunningResult, expectedCodes = Set(201))
+      val lroResult = RESTHelpers.sendAndParseJson(getLongRunningResult, expectedCodes = Set(201))
         .convertTo[LongRunningOperationResult]
-        .resourceLocation.mkString
-      udid = resourceLocation.split(Array('/', '?', '&'))(5)
+      val resourceLocation = lroResult.resourceLocation.getOrElse("")
+      if (resourceLocation.isEmpty) {
+        throw new RuntimeException("Resource location is empty in LongRunningOperationResult")
+      }
+      val uri = new URI(resourceLocation)
+      val path = uri.getPath
+      udid = path.split("/").last
     }
   }
 
