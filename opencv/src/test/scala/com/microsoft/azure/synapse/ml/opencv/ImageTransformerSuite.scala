@@ -390,7 +390,7 @@ class ImageTransformerSuite extends TransformerFuzzing[ImageTransformer] with Op
     assert(row.getAs[Int]("nChannels") == 3)
     assert(row.getAs[Int]("mode") == 16)
 
-    val tensor = row.getAs[Seq[Seq[Seq[Float]]]]("features")
+    val tensor = row.getAs[scala.collection.Seq[scala.collection.Seq[scala.collection.Seq[Float]]]]("features")
 
     val channelRed = tensor.head
     assert(channelRed.length == 500)
@@ -425,7 +425,7 @@ class ImageTransformerSuite extends TransformerFuzzing[ImageTransformer] with Op
     assert(row.getAs[Int]("nChannels") == 4)
     assert(row.getAs[Int]("mode") == 24)
 
-    val tensor = row.getAs[Seq[Seq[Seq[Double]]]]("features")
+    val tensor = row.getAs[scala.collection.Seq[scala.collection.Seq[scala.collection.Seq[Double]]]]("features")
 
     val channelRed = tensor.head
     assert(channelRed.length == 100)
@@ -461,7 +461,7 @@ class ImageTransformerSuite extends TransformerFuzzing[ImageTransformer] with Op
     assert(row.getAs[Int]("nChannels") == 1)
     assert(row.getAs[Int]("mode") == CvType.CV_8UC1)
 
-    val tensor = row.getAs[Seq[Seq[Seq[Double]]]]("features")
+    val tensor = row.getAs[scala.collection.Seq[scala.collection.Seq[scala.collection.Seq[Double]]]]("features")
     assert(tensor.length == 1)
 
     val channel = tensor.head
