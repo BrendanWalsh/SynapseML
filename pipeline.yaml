@@ -63,6 +63,8 @@ variables:
   UBUNTU_VERSION: ubuntu-22.04
   ComponentDetection.Timeout: 900
   isMaster: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+  SBT_OPTS: >-
+    -Xms2G -Xmx4G -Xss5M -XX:+UseG1GC -Duser.timezone=GMT --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.base/jdk.internal.ref=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/sun.nio.cs=ALL-UNNAMED --add-opens=java.base/sun.security.action=ALL-UNNAMED --add-opens=java.base/sun.util.calendar=ALL-UNNAMED --add-opens=java.security.jgss/sun.security.krb5=ALL-UNNAMED --add-opens=java.base/java.util.zip=ALL-UNNAMED
 
 jobs:
 - job: Style
@@ -428,7 +430,7 @@ jobs:
         inlineScript: |
           set -e
           source activate synapseml
-          export SBT_OPTS="-Xms2G -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -Xss5M  -Duser.timezone=GMT"
+          export SBT_OPTS="$(SBT_OPTS)"
           echo "##vso[task.setvariable variable=SBT_OPTS]$SBT_OPTS"
           echo "SBT_OPTS=$SBT_OPTS"
           IGNORE_TEST_PATH_FLAG=""
@@ -486,6 +488,12 @@ jobs:
         PACKAGE: "cognitive"
   steps:
     #- template: templates/ivy_cache_2.yml
+    - task: JavaToolInstaller@0
+      displayName: 'Use Java 17'
+      inputs:
+        versionSpec: '17'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
     - template: templates/update_cli.yml
     - template: templates/conda.yml
     - template: templates/kv.yml
@@ -499,7 +507,7 @@ jobs:
         scriptType: bash
         inlineScript: |
           set -e
-          export SBT_OPTS="-Xms2G -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -Xss5M  -Duser.timezone=GMT"
+          export SBT_OPTS="$(SBT_OPTS)"
           source activate synapseml
           (timeout 5m sbt setup) || (echo "retrying" && timeout 5m sbt setup) || (echo "retrying" && timeout 5m sbt setup)
           sbt codegen
@@ -518,7 +526,7 @@ jobs:
         scriptType: bash
         inlineScript: |
           set -e
-          export SBT_OPTS="-Xms2G -Xmx4G -XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=4G -Xss5M  -Duser.timezone=GMT"
+          export SBT_OPTS="$(SBT_OPTS)"
           source activate synapseml
           timeout 20m sbt -DskipCodegen=true "project $(PACKAGE)" coverage testR
     - task: PublishTestResults@2
@@ -553,6 +561,12 @@ jobs:
     vmImage: $(UBUNTU_VERSION)
   steps:
     #- template: templates/ivy_cache.yml
+    - task: JavaToolInstaller@0
+      displayName: 'Use Java 17'
+      inputs:
+        versionSpec: '17'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
     - template: templates/update_cli.yml
     - template: templates/conda.yml
     - template: templates/kv.yml
@@ -593,6 +607,12 @@ jobs:
   steps:
     - checkout: self
       persistCredentials: true
+    - task: JavaToolInstaller@0
+      displayName: 'Use Java 17'
+      inputs:
+        versionSpec: '17'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
     - template: templates/update_cli.yml
     - template: templates/conda.yml
     - template: templates/kv.yml
@@ -748,6 +768,12 @@ jobs:
   steps:
     #- template: templates/ivy_cache.yml
     - template: templates/update_cli.yml
+    - task: JavaToolInstaller@0
+      displayName: 'Use Java 17'
+      inputs:
+        versionSpec: '17'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
     - task: AzureCLI@2
       displayName: 'Setup repo'
       retryCountOnTaskFailure: 1
@@ -771,7 +797,7 @@ jobs:
         scriptType: bash
         inlineScript: |
           ulimit -c unlimited
-          export SBT_OPTS="-XX:+UseConcMarkSweepGC -XX:+CMSClassUnloadingEnabled -Xss2M  -Duser.timezone=GMT"
+          export SBT_OPTS="$(SBT_OPTS)"
           (timeout 30m sbt coverage "testOnly com.microsoft.azure.synapse.ml.$(PACKAGE).**") ||
           (${FLAKY:-false} && timeout 30m sbt coverage "testOnly com.microsoft.azure.synapse.ml.$(PACKAGE).**")
     - task: PublishTestResults@2

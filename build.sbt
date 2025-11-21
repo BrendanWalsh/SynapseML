@@ -10,9 +10,15 @@ val condaEnvName = "synapseml"
 val sparkVersion = "4.0.0"
 name := "synapseml"
 ThisBuild / organization := "com.microsoft.azure"
-ThisBuild / scalaVersion := "2.13.12"
+ThisBuild / scalaVersion := "2.13.16"
 
 val scalaMajorVersion = 2.13
+
+val isAppleSiliconHost: Boolean = {
+  val osName = sys.props.getOrElse("os.name", "").toLowerCase
+  val arch = sys.props.getOrElse("os.arch", "").toLowerCase
+  osName.contains("mac") && (arch.contains("aarch64") || arch.contains("arm64"))
+}
 
 val excludes = Seq(
   ExclusionRule("org.apache.spark", s"spark-tags_$scalaMajorVersion"),
@@ -331,6 +337,15 @@ lazy val opencv = (project in file("opencv"))
   .dependsOn(core % "test->test;compile->compile")
   .settings(settings ++ Seq(
     libraryDependencies += ("org.openpnp" % "opencv" % "3.2.0-1"),
+    Test / testOptions ++= {
+      if (isAppleSiliconHost) {
+        Seq(
+          Tests.Exclude(Seq("com.microsoft.azure.synapse.ml.opencv.ImageSetAugmenterSuite")),
+          Tests.Exclude(Seq("com.microsoft.azure.synapse.ml.opencv.ImageTransformerSuite")))
+      } else {
+        Nil
+      }
+    },
     name := "synapseml-opencv"
   ): _*)
 

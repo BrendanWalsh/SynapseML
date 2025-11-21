@@ -30,20 +30,21 @@ class HTTPSuite extends TestBase with HTTPTestUtils {
       .option("checkpointLocation", new File(tmpDir.toFile, "checkpoints").toString)
       .start()
 
-    Thread.sleep(5000)
-    val client = HttpClientBuilder.create().build()
-    val p1 = sendJsonRequest(Map("foo" -> 1, "bar" -> "here"), url)
-    val p2 = sendJsonRequest(Map("foo" -> 1, "bar" -> "heree"), url)
-    val p3 = sendJsonRequest(Map("foo" -> 1, "bar" -> "hereee"), url)
-    val p4 = sendJsonRequest(Map("foo" -> 1, "bar" -> "hereeee"), url)
-    val posts = List(p1, p2, p3, p4)
-    val correctResponses = List(22, 23, 24, 25)
-
-    posts.zip(correctResponses).foreach { p =>
-      assert(p._1 === p._2.toString)
+    using(q1) {
+      waitForServer(q1)
+      val client = HttpClientBuilder.create().build()
+      try {
+        val posts = List(
+          sendJsonRequest(Map("foo" -> 1, "bar" -> "here"), url),
+          sendJsonRequest(Map("foo" -> 1, "bar" -> "heree"), url),
+          sendJsonRequest(Map("foo" -> 1, "bar" -> "hereee"), url),
+          sendJsonRequest(Map("foo" -> 1, "bar" -> "hereeee"), url))
+        val correctResponses = List(22, 23, 24, 25).map(_.toString)
+        posts.zip(correctResponses).foreach { case (resp, expected) => assert(resp === expected) }
+      } finally {
+        client.close()
+      }
     }
-    q1.stop()
-    client.close()
   }
 
 }
