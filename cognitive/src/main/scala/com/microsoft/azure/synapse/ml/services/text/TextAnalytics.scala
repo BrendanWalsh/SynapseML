@@ -663,11 +663,11 @@ class TextAnalyze(override val uid: String) extends TextAnalyticsBaseNoBinding(u
     Option(responseOpt).map { response =>
       val tasks = response.getAs[Row]("tasks")
       val flattenedTasks = Seq(
-        flattenTask(tasks.getAs[scala.collection.Seq[Row]]("entityRecognitionTasks")),
-        flattenTask(tasks.getAs[scala.collection.Seq[Row]]("entityLinkingTasks")),
-        flattenTask(tasks.getAs[scala.collection.Seq[Row]]("entityRecognitionPiiTasks")),
-        flattenTask(tasks.getAs[scala.collection.Seq[Row]]("keyPhraseExtractionTasks")),
-        flattenTask(tasks.getAs[scala.collection.Seq[Row]]("sentimentAnalysisTasks"))
+        flattenTask(tasks.getAs[scala.collection.Seq[Row]]("entityRecognitionTasks").toSeq),
+        flattenTask(tasks.getAs[scala.collection.Seq[Row]]("entityLinkingTasks").toSeq),
+        flattenTask(tasks.getAs[scala.collection.Seq[Row]]("entityRecognitionPiiTasks").toSeq),
+        flattenTask(tasks.getAs[scala.collection.Seq[Row]]("keyPhraseExtractionTasks").toSeq),
+        flattenTask(tasks.getAs[scala.collection.Seq[Row]]("sentimentAnalysisTasks").toSeq)
       ).map(ftOpt => ftOpt.map(_.toArray))
       val totalDocs = flattenedTasks.flatten.head.length
 
