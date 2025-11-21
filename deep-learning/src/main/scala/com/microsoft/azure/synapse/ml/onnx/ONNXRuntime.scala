@@ -67,7 +67,7 @@ object ONNXRuntime extends Logging {
         val inputTensors = session.getInputInfo.asScala.map {
           case (inputName, inputNodeInfo) =>
 
-            val batchedValues: Seq[Any] = row.getAs[Seq[Any]](feedMap(inputName))
+            val batchedValues = row.getAs[scala.collection.Seq[Any]](feedMap(inputName)).toSeq
 
             inputNodeInfo.getInfo match {
               case tensorInfo: TensorInfo => // Only supports tensor input.
