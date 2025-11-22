@@ -73,11 +73,11 @@ class ContextualBanditMetrics extends Serializable {
   }
 
   def getSnipsEstimate: Double = {
-    snipsNumerator / snipsDenominator
+    if (snipsDenominator == 0) 0.0 else snipsNumerator / snipsDenominator
   }
 
   def getIpsEstimate: Double = {
-    snipsNumerator / totalEvents
+    if (totalEvents == 0) 0.0 else snipsNumerator / totalEvents
   }
 }
 

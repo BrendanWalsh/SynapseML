@@ -78,15 +78,15 @@ object ONNXRuntime extends Logging {
         }
 
         // Run the tensors through the ONNX runtime.
-        val outputBatches: Seq[Seq[Any]] = using(session.run(inputTensors.asJava)) {
-          result =>
-            // Map the output tensors to batches.
-            fetchMap.map {
-              case (_, outputName) =>
-                val i = session.getOutputInfo.asScala.keysIterator.indexOf(outputName)
-                val outputValue: OnnxValue = result.get(i)
-                mapOnnxValueToArray(outputValue)
-            }.toSeq
+        val outputBatches: Seq[Seq[Any]] = using(session.run(inputTensors.asJava)) { result =>
+          // Map the output tensors to batches. Convert to a Scala sequence first to avoid
+          // ClassCastException between Java map wrappers and immutable Seq.
+          fetchMap.toSeq.map {
+            case (_, outputName) =>
+              val i = session.getOutputInfo.asScala.keysIterator.indexOf(outputName)
+              val outputValue: OnnxValue = result.get(i)
+              mapOnnxValueToArray(outputValue)
+          }
         }.get
 
         // Close the tensor and clean up native handles

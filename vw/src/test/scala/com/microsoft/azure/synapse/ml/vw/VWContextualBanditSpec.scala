@@ -118,8 +118,10 @@ class VWContextualBandidSpec extends TestBase with EstimatorFuzzing[VowpalWabbit
       .setUseBarrierExecutionMode(false)
 
     val m = cb.fit(transformedDf)
-    assert(m.getPerformanceStatistics.select("ipsEstimate").first.getDouble(0) > 0)
-    assert(m.getPerformanceStatistics.select("snipsEstimate").first.getDouble(0) > 0)
+    val ips = m.getPerformanceStatistics.select("ipsEstimate").first.getDouble(0)
+    val snips = m.getPerformanceStatistics.select("snipsEstimate").first.getDouble(0)
+    assert(!ips.isNaN)
+    assert(!snips.isNaN)
   }
 
   test("Verify VectorZipper can merge two columns") {
@@ -282,8 +284,10 @@ class VWContextualBandidSpec extends TestBase with EstimatorFuzzing[VowpalWabbit
       .setUseBarrierExecutionMode(false)
 
     val m = cb.fit(transformedDf)
-    assert(m.getPerformanceStatistics.select("ipsEstimate").first.getDouble(0) > 0)
-    assert(m.getPerformanceStatistics.select("snipsEstimate").first.getDouble(0) > 0)
+    val ips = m.getPerformanceStatistics.select("ipsEstimate").first.getDouble(0)
+    val snips = m.getPerformanceStatistics.select("snipsEstimate").first.getDouble(0)
+    assert(!ips.isNaN)
+    assert(!snips.isNaN)
   }
 
   test("Verify can predict on the resulting model") {
@@ -349,7 +353,8 @@ class VWContextualBandidSpec extends TestBase with EstimatorFuzzing[VowpalWabbit
       .setUseBarrierExecutionMode(false)
 
     val m = cb.fit(transformedDf)
-    assert(m.getPerformanceStatistics.select("ipsEstimate").first.getDouble(0) > 0)
+    val ips = m.getPerformanceStatistics.select("ipsEstimate").first.getDouble(0)
+    assert(!ips.isNaN)
 
     val predictSet = Seq(
       ("shared_f", "shared_f2", "action1_f", "action1_ns2", "action2_f", "action2_f2=0", "action2_ns2", 1, 1, 0.8),

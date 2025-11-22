@@ -15,7 +15,9 @@ trait OptimizedCKNNFitting extends ConditionalKNNParams with SynapseMLLogging {
 
   private def fitGeneric[V: scala.reflect.ClassTag, L: scala.reflect.ClassTag](dataset: Dataset[_]): ConditionalKNNModel = {
 
-    val kvlTriples = dataset.toDF().select(getFeaturesCol, getValuesCol, getLabelCol).collect()
+    val kvlTriples = dataset.toDF()
+      .select(getFeaturesCol, getValuesCol, getLabelCol)
+      .collect()
       .map { row =>
         val bdv = new BDV(row.getAs[Vector](getFeaturesCol).toDense.values)
         val value = row.getAs[V](getValuesCol)

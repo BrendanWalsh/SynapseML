@@ -76,7 +76,8 @@ class DistributionBalanceMeasure(override val uid: String)
     set(referenceDistribution, value.map(_.iterator.map { case (k, v) => k -> v.asInstanceOf[Any] }.toMap))
 
   def setReferenceDistribution(value: util.ArrayList[util.HashMap[String, Double]]): this.type = {
-    val arrayMap = value.asScala.toArray.map(_.asScala.toMap.iterator.map { case (k, v) => k -> v.asInstanceOf[Any] }.toMap)
+    val arrayMap = value.asScala.toArray
+      .map(_.asScala.toMap.iterator.map { case (k, v) => k -> v.asInstanceOf[Any] }.toMap)
     set(referenceDistribution, arrayMap)
   }
 

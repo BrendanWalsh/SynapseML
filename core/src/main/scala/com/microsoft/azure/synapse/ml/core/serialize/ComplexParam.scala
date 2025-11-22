@@ -12,7 +12,11 @@ import org.apache.spark.sql.SparkSession
 import scala.reflect.runtime.universe.{TypeTag, typeTag}
 import scala.reflect.ClassTag
 
-abstract class ComplexParam[T: TypeTag : ClassTag](parent: Params, name: String, doc: String, isValid: T => Boolean)
+abstract class ComplexParam[T: TypeTag : ClassTag](
+    parent: Params,
+    name: String,
+    doc: String,
+    isValid: T => Boolean)
   extends Param[T](parent, name, doc, isValid) with WrappableParam[T] {
 
   def ttag: TypeTag[T] = typeTag[T]
