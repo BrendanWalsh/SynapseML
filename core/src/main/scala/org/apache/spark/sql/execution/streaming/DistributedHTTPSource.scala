@@ -351,13 +351,19 @@ class DistributedHTTPSourceProvider extends StreamSourceProvider with DataSource
                             providerName: String,
                             parameters: Map[String, String]): (String, StructType) = {
     if (!parameters.contains("host")) {
-      throw new AnalysisException(errorClass = "INTERNAL_ERROR", messageParameters = Map("message" -> "Set a host to read from with option(\"host\", ...)."))
+      throw new AnalysisException(
+        errorClass = "INTERNAL_ERROR",
+        messageParameters = Map("message" -> "Set a host to read from with option(\"host\", ...)."))
     }
     if (!parameters.contains("port")) {
-      throw new AnalysisException(errorClass = "INTERNAL_ERROR", messageParameters = Map("message" -> "Set a port to read from with option(\"port\", ...)."))
+      throw new AnalysisException(
+        errorClass = "INTERNAL_ERROR",
+        messageParameters = Map("message" -> "Set a port to read from with option(\"port\", ...)."))
     }
     if (!parameters.contains("path")) {
-      throw new AnalysisException(errorClass = "INTERNAL_ERROR", messageParameters = Map("message" -> "Set a name of the API which is used for routing"))
+      throw new AnalysisException(
+        errorClass = "INTERNAL_ERROR",
+        messageParameters = Map("message" -> "Set a name of the API which is used for routing"))
     }
     ("DistributedHTTP", HTTPSourceV2.Schema)
   }

@@ -109,7 +109,10 @@ object ONNXUtils {
   private def validateBatchShapes(batchedValues: scala.collection.Seq[_], expectedShape: Array[Long]): Array[Long] = {
     // Validate input shape based on first sequence in each parent
     @tailrec
-    def validateOneShape(nestedSeq: scala.collection.Seq[_], currentSize: Array[Long], expectedShape: Array[Long]): Array[Long] = {
+    def validateOneShape(
+      nestedSeq: scala.collection.Seq[_],
+      currentSize: Array[Long],
+      expectedShape: Array[Long]): Array[Long] = {
       if (nestedSeq.isEmpty) {
         throw new IllegalArgumentException("Input element dimension is empty")
       }
