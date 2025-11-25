@@ -169,11 +169,15 @@ class ImageTransformerSuite extends TransformerFuzzing[ImageTransformer] with Op
   }
 
   lazy val images: DataFrame = spark.read.image.option("dropInvalid", value = true)
-    .load(FileUtilities.join(fileLocation, "**").toString)
+    .load(fileLocation.toString)
 
-  lazy val badImages: DataFrame =
-    spark.read.image.load(
-      ".//opencv//src//test//scala//com//microsoft//azure//synapse//ml//opencv//cmyk_image.jpg")
+  lazy val badImages: DataFrame = {
+    val coreDir = BuildInfo.baseDirectory
+    val rootDir = coreDir.getParentFile
+    val imageFile = FileUtilities.join(rootDir, "opencv", "src", "test", "scala",
+      "com", "microsoft", "azure", "synapse", "ml", "opencv", "cmyk_image.jpg")
+    spark.read.image.load(imageFile.toString)
+  }
 
   test("general workflow") {
     //assert(images.count() == 30) //TODO this does not work on build machine for some reason
@@ -202,7 +206,7 @@ class ImageTransformerSuite extends TransformerFuzzing[ImageTransformer] with Op
   }
 
   test("binary file input") {
-    val binaries = spark.read.binary.load(FileUtilities.join(fileLocation, "**").toString)
+    val binaries = spark.read.binary.load(fileLocation.toString)
     assert(binaries.count() == 31)
     binaries.printSchema()
 
@@ -225,7 +229,7 @@ class ImageTransformerSuite extends TransformerFuzzing[ImageTransformer] with Op
 
   test("binary file input 2") {
     val binaries = spark.read.binary
-      .load(FileUtilities.join(fileLocation, "**").toString)
+      .load(fileLocation.toString)
       .select("value.bytes")
     assert(binaries.count() == 31)
     binaries.printSchema()
