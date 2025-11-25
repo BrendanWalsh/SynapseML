@@ -74,8 +74,8 @@ class TranslateSuite extends TransformerFuzzing[Translate]
       .setOutputCol("translation")
       .setConcurrency(5)
     val result3 = getTranslationTextResult(translate1.setToLanguage("zh-Hans"), emptyDf).collect()
-    val greeting1 = result3(0).getSeq(0).mkString("\n")
-    assert(greeting1.contains("嗨") || greeting1.contains("你好"))
+    val res3 = result3(0).getSeq(0).mkString("\n")
+    assert(res3.contains("嗨") || res3.contains("你好"))
 
     val translate2: Translate = new Translate()
       .setSubscriptionKey(translatorKey)
@@ -85,8 +85,8 @@ class TranslateSuite extends TransformerFuzzing[Translate]
       .setOutputCol("translation")
       .setConcurrency(5)
     val result4 = getTranslationTextResult(translate2, textDf6).collect()
-    val greeting2 = result4(0).getSeq(0).mkString("")
-    assert(greeting2.contains("嗨") || greeting2.contains("你好"))
+    val res4 = result4(0).getSeq(0).mkString("")
+    assert(res4.contains("嗨") || res4.contains("你好"))
     assert(result4(1).get(0) == null)
     assert(result4(2).get(0) == null)
   }
@@ -128,6 +128,7 @@ class TranslateSuite extends TransformerFuzzing[Translate]
   test("Translate content with markup and decide what's translated") {
     val result1 = getTranslationTextResult(
       translate.setFromLanguage("en").setToLanguage(Seq("zh-Hans")).setTextType("html"), textDf4).collect()
+<<<<<<< HEAD
     val resultStr = result1(0).getSeq(0).mkString("\n")
     val expectedNoTranslate = "<div class=\"notranslate\">This will not be translated.</div>"
     assert(resultStr.startsWith(expectedNoTranslate))
@@ -135,6 +136,11 @@ class TranslateSuite extends TransformerFuzzing[Translate]
     assert(resultStr.contains("翻译"))
     // Verify it doesn't contain the English source for the second part
     assert(!resultStr.contains("<div>This will be translated.</div>"))
+=======
+    val res = result1(0).getSeq(0).mkString("\n")
+    assert(res == "<div class=\"notranslate\">This will not be translated.</div><div>这将被翻译。</div>" ||
+           res == "<div class=\"notranslate\">This will not be translated.</div><div>这会被翻译。</div>")
+>>>>>>> 4b302044e3 (latest)
   }
 
   test("Obtain alignment information") {
