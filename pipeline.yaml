@@ -194,6 +194,10 @@ jobs:
         scriptType: bash
         inlineScript: |
           set -e
+          if [ -n "${JAVA_HOME_17_X64:-}" ]; then
+            export JAVA_HOME="$JAVA_HOME_17_X64"
+            export PATH="$JAVA_HOME/bin:$PATH"
+          fi
           source activate synapseml
           sbt "testOnly $(TEST-CLASS)"
       condition: and(succeeded(), eq(variables.runTests, 'True'))
@@ -627,6 +631,10 @@ jobs:
         scriptLocation: inlineScript
         scriptType: bash
         inlineScript: |
+          if [ -n "${JAVA_HOME_17_X64:-}" ]; then
+            export JAVA_HOME="$JAVA_HOME_17_X64"
+            export PATH="$JAVA_HOME/bin:$PATH"
+          fi
           source activate synapseml
           sbt convertNotebooks
     - bash: |
