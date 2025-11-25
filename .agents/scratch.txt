@@ -1,0 +1,153 @@
+{
+  "appendCommitMessageToRunName": true,
+  "buildNumber": "20251120.15",
+  "buildNumberRevision": 15,
+  "controller": null,
+  "definition": {
+    "createdDate": null,
+    "drafts": [],
+    "id": 17563,
+    "name": "microsoft.SynapseML",
+    "path": "\\",
+    "project": {
+      "abbreviation": null,
+      "defaultTeamImageUrl": null,
+      "description": "Azure Synapse Analytics",
+      "id": "b9b2accc-2d1c-45b3-9d24-0eb5d78cc47f",
+      "lastUpdateTime": "2025-10-14T12:41:00.28Z",
+      "name": "A365",
+      "revision": 9030,
+      "state": "wellFormed",
+      "url": "https://msdata.visualstudio.com/_apis/projects/b9b2accc-2d1c-45b3-9d24-0eb5d78cc47f",
+      "visibility": "organization"
+    },
+    "queueStatus": "enabled",
+    "revision": 7,
+    "type": "build",
+    "uri": "vstfs:///Build/Definition/17563",
+    "url": "https://msdata.visualstudio.com/b9b2accc-2d1c-45b3-9d24-0eb5d78cc47f/_apis/build/Definitions/17563?revision=7"
+  },
+  "deleted": null,
+  "deletedBy": null,
+  "deletedDate": null,
+  "deletedReason": null,
+  "demands": null,
+  "finishTime": "2025-11-21T05:01:14.478854+00:00",
+  "id": 198170712,
+  "keepForever": false,
+  "lastChangedBy": {
+    "descriptor": "s2s.MDAwMDAwMDItMDAwMC04ODg4LTgwMDAtMDAwMDAwMDAwMDAwQDJjODk1OTA4LTA0ZTAtNDk1Mi04OWZkLTU0YjAwNDZkNjI4OA",
+    "directoryAlias": null,
+    "displayName": "Microsoft.VisualStudio.Services.TFS",
+    "id": "00000002-0000-8888-8000-000000000000",
+    "imageUrl": "https://msdata.visualstudio.com/_apis/GraphProfile/MemberAvatars/s2s.MDAwMDAwMDItMDAwMC04ODg4LTgwMDAtMDAwMDAwMDAwMDAwQDJjODk1OTA4LTA0ZTAtNDk1Mi04OWZkLTU0YjAwNDZkNjI4OA",
+    "inactive": null,
+    "isAadIdentity": null,
+    "isContainer": null,
+    "isDeletedInOrigin": null,
+    "profileUrl": null,
+    "uniqueName": "00000002-0000-8888-8000-000000000000@2c895908-04e0-4952-89fd-54b0046d6288",
+    "url": "https://spsprodwus21.vssps.visualstudio.com/Abb9d19ad-2a17-4cfa-af94-2860838186fb/_apis/Identities/00000002-0000-8888-8000-000000000000"
+  },
+  "lastChangedDate": "2025-11-21T05:01:14.860000+00:00",
+  "logs": {
+    "id": 0,
+    "type": "Container",
+    "url": "https://msdata.visualstudio.com/b9b2accc-2d1c-45b3-9d24-0eb5d78cc47f/_apis/build/builds/198170712/logs"
+  },
+  "orchestrationPlan": {
+    "orchestrationType": null,
+    "planId": "73fbf586-ce6b-42a6-b86c-aa2a1237e903"
+  },
+  "parameters": null,
+  "plans": [
+    {
+      "orchestrationType": null,
+      "planId": "73fbf586-ce6b-42a6-b86c-aa2a1237e903"
+    }
+  ],
+  "priority": "normal",
+  "project": {
+    "abbreviation": null,
+    "defaultTeamImageUrl": null,
+    "description": "Azure Synapse Analytics",
+    "id": "b9b2accc-2d1c-45b3-9d24-0eb5d78cc47f",
+    "lastUpdateTime": "2025-10-14T12:41:00.28Z",
+    "name": "A365",
+    "revision": 9030,
+    "state": "wellFormed",
+    "url": "https://msdata.visualstudio.com/_apis/projects/b9b2accc-2d1c-45b3-9d24-0eb5d78cc47f",
+    "visibility": "organization"
+  },
+  "properties": {},
+  "quality": null,
+  "queue": {
+    "id": 3098,
+    "name": "Azure Pipelines",
+    "pool": {
+      "id": 303,
+      "isHosted": true,
+      "name": "Azure Pipelines"
+    },
+    "url": null
+  },
+  "queueOptions": null,
+  "queuePosition": null,
+  "queueTime": "2025-11-21T03:54:50.637128+00:00",
+  "reason": "manual",
+  "repository": {
+    "checkoutSubmodules": false,
+    "clean": null,
+    "defaultBranch": null,
+    "id": "microsoft/SynapseML",
+    "name": null,
+    "properties": null,
+    "rootFolder": null,
+    "type": "GitHub",
+    "url": null
+  },
+  "requestedBy": {
+    "descriptor": "aad.MTk5NjE1OTMtOWYwMS03NTJlLWJlMDYtNzNkNjFhMjdjY2I0",
+    "directoryAlias": null,
+    "displayName": "Brendan Walsh",
+    "id": "4f83b8e1-4e9c-48fb-b50c-5627b0ab40a6",
+    "imageUrl": "https://msdata.visualstudio.com/_apis/GraphProfile/MemberAvatars/aad.MTk5NjE1OTMtOWYwMS03NTJlLWJlMDYtNzNkNjFhMjdjY2I0",
+    "inactive": null,
+    "isAadIdentity": null,
+    "isContainer": null,
+    "isDeletedInOrigin": null,
+    "profileUrl": null,
+    "uniqueName": "brwals@microsoft.com",
+    "url": "https://spsprodwus21.vssps.visualstudio.com/Abb9d19ad-2a17-4cfa-af94-2860838186fb/_apis/Identities/4f83b8e1-4e9c-48fb-b50c-5627b0ab40a6"
+  },
+  "requestedFor": {
+    "descriptor": "aad.MTk5NjE1OTMtOWYwMS03NTJlLWJlMDYtNzNkNjFhMjdjY2I0",
+    "directoryAlias": null,
+    "displayName": "Brendan Walsh",
+    "id": "4f83b8e1-4e9c-48fb-b50c-5627b0ab40a6",
+    "imageUrl": "https://msdata.visualstudio.com/_apis/GraphProfile/MemberAvatars/aad.MTk5NjE1OTMtOWYwMS03NTJlLWJlMDYtNzNkNjFhMjdjY2I0",
+    "inactive": null,
+    "isAadIdentity": null,
+    "isContainer": null,
+    "isDeletedInOrigin": null,
+    "profileUrl": null,
+    "uniqueName": "brwals@microsoft.com",
+    "url": "https://spsprodwus21.vssps.visualstudio.com/Abb9d19ad-2a17-4cfa-af94-2860838186fb/_apis/Identities/4f83b8e1-4e9c-48fb-b50c-5627b0ab40a6"
+  },
+  "result": "failed",
+  "retainedByRelease": false,
+  "sourceBranch": "refs/heads/brwals/spark4/g",
+  "sourceVersion": "c8e3c2b0bbd3c9e2dd2335355da6f81fafc3c79b",
+  "startTime": "2025-11-21T03:55:02.269329+00:00",
+  "status": "completed",
+  "tags": [],
+  "templateParameters": {
+    "SYNAPSE_ENVIRONMENT": "weekly",
+    "runSynapseExtensionE2ETests": "True"
+  },
+  "triggerInfo": {},
+  "triggeredByBuild": null,
+  "uri": "vstfs:///Build/Build/198170712",
+  "url": "https://msdata.visualstudio.com/b9b2accc-2d1c-45b3-9d24-0eb5d78cc47f/_apis/build/Builds/198170712",
+  "validationResults": []
+}
