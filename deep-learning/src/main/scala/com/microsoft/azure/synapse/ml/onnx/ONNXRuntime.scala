@@ -65,8 +65,8 @@ object ONNXRuntime extends Logging {
         // Get the input tensors for each input node.
         val inputTensors = session.getInputInfo.asScala.map {
           case (inputName, inputNodeInfo) =>
-
-            val batchedValues: Seq[Any] = row.getAs[Seq[Any]](feedMap(inputName))
+            val inputColName = feedMap(inputName)
+            val batchedValues: Seq[Any] = row.getSeq[Any](row.fieldIndex(inputColName))
 
             inputNodeInfo.getInfo match {
               case tensorInfo: TensorInfo => // Only supports tensor input.
@@ -95,7 +95,7 @@ object ONNXRuntime extends Logging {
         }
 
         // Return a row for each output batch: original payload appended with model output.
-        val data = inputSchema.map(f => row.getAs[Any](f.name))
+        val data = inputSchema.map(f => row.get(row.fieldIndex(f.name)))
         Row.fromSeq(data ++ outputBatches)
     }
 
