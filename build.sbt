@@ -253,6 +253,7 @@ val settings = Seq(
   Test / parallelExecution := false,
   Test / publishArtifact := true,
   Test / fork := true,
+  Test / envVars := Map("PATH" -> sys.env.getOrElse("PATH", "")),
   Test / javaOptions ++= {
     // Only add --add-opens flags for Java 11+
     val javaVersion = System.getProperty("java.version")
