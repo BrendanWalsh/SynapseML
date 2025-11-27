@@ -208,7 +208,8 @@ object SparkHelpers {
     )
 
     ratings.toDF(srcOutputColumn, dstOutputColumn, Constants.RatingCol).groupBy(srcOutputColumn)
-     .agg(slice(array_sort(collect_list(struct(col(Constants.RatingCol).desc, col(dstOutputColumn)))), 1, num).as("topK"))
+     .agg(slice(array_sort(collect_list(
+       struct(col(Constants.RatingCol).desc, col(dstOutputColumn)))), 1, num).as("topK"))
      .as[(Int, Seq[(Float, Int)])]
      .map(t => (t._1, t._2.map(p => (p._2, p._1))))
      .toDF(srcOutputColumn, Constants.Recommendations)

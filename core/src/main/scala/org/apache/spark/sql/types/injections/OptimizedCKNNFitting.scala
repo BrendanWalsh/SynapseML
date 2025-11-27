@@ -13,7 +13,8 @@ import org.apache.spark.sql.types._
 
 trait OptimizedCKNNFitting extends ConditionalKNNParams with SynapseMLLogging {
 
-  private def fitGeneric[V, L](dataset: Dataset[_])(implicit ctV: scala.reflect.ClassTag[V], ctL: scala.reflect.ClassTag[L]): ConditionalKNNModel = {
+  private def fitGeneric[V, L](dataset: Dataset[_])(
+      implicit ctV: scala.reflect.ClassTag[V], ctL: scala.reflect.ClassTag[L]): ConditionalKNNModel = {
 
     val kvlTriples = dataset.toDF().select(getFeaturesCol, getValuesCol, getLabelCol).collect()
       .map { row =>

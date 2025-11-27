@@ -90,7 +90,8 @@ class HTTPSource(name: String, host: String, port: Int, sqlContext: SQLContext)
       val sliceStart = startOrdinal - lastOffsetCommitted.offset.toInt - 1
       val sliceEnd = endOrdinal - lastOffsetCommitted.offset.toInt - 1
       requests.slice(sliceStart, sliceEnd).map{ case(id, request) =>
-        Row.fromSeq(Seq(Row(null, id.toString, null), toRow(HTTPRequestData.fromHTTPExchange(request)))) //scalastyle:ignore null
+        Row.fromSeq(Seq(Row(null, id.toString, null), //scalastyle:ignore null
+          toRow(HTTPRequestData.fromHTTPExchange(request))))
       }
     }
     val rawBatch = if (rawList.nonEmpty) {
@@ -138,13 +139,16 @@ class HTTPSourceProvider extends StreamSourceProvider with DataSourceRegister wi
     logWarning("The socket source should not be used for production applications! " +
                  "It does not support recovery.")
     if (!parameters.contains("host")) {
-      throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY", Map("key" -> "host", "message" -> "Set a host to read from with option(\"host\", ...)"))
+      throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY",
+        Map("key" -> "host", "message" -> "Set a host to read from with option(\"host\", ...)"))
     }
     if (!parameters.contains("port")) {
-      throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY", Map("key" -> "port", "message" -> "Set a port to read from with option(\"port\", ...)"))
+      throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY",
+        Map("key" -> "port", "message" -> "Set a port to read from with option(\"port\", ...)"))
     }
     if (!parameters.contains("path")) {
-      throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY", Map("key" -> "path", "message" -> "Set a name of the API which is used for routing"))
+      throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY",
+        Map("key" -> "path", "message" -> "Set a name of the API which is used for routing"))
     }
     ("HTTP", HTTPSourceV2.Schema)
   }
@@ -169,7 +173,8 @@ class HTTPSourceProvider extends StreamSourceProvider with DataSourceRegister wi
 class HTTPSink(val options: Map[String, String]) extends Sink with Logging {
 
   if (!options.contains("name")) {
-    throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY", Map("key" -> "name", "message" -> "Set a name of an API to reply to"))
+    throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY",
+      Map("key" -> "name", "message" -> "Set a name of an API to reply to"))
   }
 
   override def addBatch(batchId: Long, data: DataFrame): Unit = synchronized {
