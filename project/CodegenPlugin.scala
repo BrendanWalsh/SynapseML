@@ -129,7 +129,7 @@ object CodegenPlugin extends AutoPlugin {
     (Test / compile).value
     val arg = testgenArgs.value
     Def.task {
-      (Test / runMain).toTask(s" com.microsoft.azure.synapse.ml.codegen.PyTestGen $arg").value
+      (Test / runMain).toTask(s" com.microsoft.azure.synapse.ml.codegen.PyTestGen '$arg'").value
     }
   } tag (PyTestGenTag)
 
@@ -138,7 +138,7 @@ object CodegenPlugin extends AutoPlugin {
     (Test / compile).value
     val arg = codegenArgs.value
     Def.task {
-      (Test / runMain).toTask(s" com.microsoft.azure.synapse.ml.codegen.RCodegen $arg").value
+      (Test / runMain).toTask(s" com.microsoft.azure.synapse.ml.codegen.RCodegen '$arg'").value
     }
   } tag (RCodeGenTag)
 
@@ -147,7 +147,7 @@ object CodegenPlugin extends AutoPlugin {
     (Test / compile).value
     val arg = testgenArgs.value
     Def.task {
-      (Test / runMain).toTask(s" com.microsoft.azure.synapse.ml.codegen.RTestGen $arg").value
+      (Test / runMain).toTask(s" com.microsoft.azure.synapse.ml.codegen.RTestGen '$arg'").value
     }
   } tag (RTestGenTag)
 
@@ -197,7 +197,7 @@ object CodegenPlugin extends AutoPlugin {
         (Test / compile).value
         val arg = codegenArgs.value
         Def.task {
-          (Compile / runMain).toTask(s" com.microsoft.azure.synapse.ml.codegen.CodeGen $arg").value
+          (Compile / runMain).toTask(s" com.microsoft.azure.synapse.ml.codegen.CodeGen '$arg'").value
         }
       } else {
         Def.task {
