@@ -4,7 +4,7 @@
 package com.microsoft.azure.synapse.ml.services.geospatial
 
 import com.microsoft.azure.synapse.ml.core.schema.SparkBindings
-import spray.json.{DefaultJsonProtocol, RootJsonFormat}
+import spray.json.{DefaultJsonProtocol, JsonFormat, RootJsonFormat}
 
 object Address extends SparkBindings[Address]
 
@@ -302,8 +302,8 @@ case class Viewport (
   btmRightPoint: Option[LatLongPairAbbreviated])
 
 object AzureMapsJsonProtocol extends DefaultJsonProtocol {
-  implicit val SeqDoubleFormat: JsonFormat[Seq[Double]] = seqFormat[Double]
-  implicit val SeqStringFormat: JsonFormat[Seq[String]] = seqFormat[String]
+  implicit val SeqDoubleFormat = seqFormat[Double]
+  implicit val SeqStringFormat = seqFormat[String]
   implicit val ErrorAdditionalInfoFormat: RootJsonFormat[ErrorAdditionalInfo] = jsonFormat2(ErrorAdditionalInfo.apply)
   implicit val ErrorDetailFormat: RootJsonFormat[ErrorDetail] = jsonFormat5(ErrorDetail.apply)
   implicit val LRORFormat: RootJsonFormat[LongRunningOperationResult] = jsonFormat6(LongRunningOperationResult.apply)

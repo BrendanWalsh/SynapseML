@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - default
 dependencies:
-  - python=3.12.11
+  - python=3.11
   - requests=2.26.0
   - pip=25.2
   - r-base=4.1.1
