@@ -12,7 +12,7 @@ import org.apache.spark.sql.SparkSession
 import scala.reflect.runtime.universe.{TypeTag, typeTag}
 import scala.reflect.ClassTag
 
-abstract class ComplexParam[T: TypeTag : ClassTag](
+abstract class ComplexParam[T: TypeTag: ClassTag](
     parent: Params,
     name: String,
     doc: String,

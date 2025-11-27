@@ -83,15 +83,15 @@ object ServiceParam {
   }
 }
 
-  class ServiceParam[T: TypeTag : ClassTag](parent: Params,
-                                            name: String,
-                                            doc: String,
-                                            isValid: Either[T, String] => Boolean =
-                                              (_: Either[T, String]) => true,
-                                            val isRequired: Boolean = false,
-                                            val isURLParam: Boolean = false,
-                                            val toValueString: T => String = { x: T => x.toString }
-                                           )
+  class ServiceParam[T: TypeTag: ClassTag](parent: Params,
+                                           name: String,
+                                           doc: String,
+                                           isValid: Either[T, String] => Boolean =
+                                             (_: Either[T, String]) => true,
+                                           val isRequired: Boolean = false,
+                                           val isURLParam: Boolean = false,
+                                           val toValueString: T => String = { x: T => x.toString }
+                                          )
                               (@transient implicit val dataFormat: JsonFormat[T])
   extends JsonEncodableParam[Either[T, String]](parent, name, doc, isValid)
     with WrappableParam[Either[T, String]] {
@@ -132,11 +132,11 @@ object ServiceParam {
 }
 
   // Use this class if you want to extend JsonEncodableParam for Cognitive services param
-  class CognitiveServiceStructParam[T: TypeTag : ClassTag](parent: Params,
-                                                           name: String,
-                                                           doc: String,
-                                                           isValid: T => Boolean = (_: T) => true)
-                                                          (@transient implicit val dataFormat: JsonFormat[T])
+  class CognitiveServiceStructParam[T: TypeTag: ClassTag](parent: Params,
+                                                          name: String,
+                                                          doc: String,
+                                                          isValid: T => Boolean = (_: T) => true)
+                                                         (@transient implicit val dataFormat: JsonFormat[T])
   extends JsonEncodableParam[T](parent, name, doc, isValid)
     with WrappableParam[T] {
 

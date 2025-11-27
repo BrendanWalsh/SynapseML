@@ -47,13 +47,16 @@ class OpenAIEmbedding (override val uid: String) extends OpenAIServicesBase(uid)
   def setTextCol(value: String): this.type = setVectorParam(text, value)
 
   override protected def getInternalOutputParser(schema: StructType): JSONOutputParser = {
-    def responseToVector(r: Row) =
-      if (r == null)
+    def responseToVector(r: Row): Option[Vector] = {
+      if (r == null) {
         None
-      else
+      } else {
         val data = r.getSeq[Row](r.fieldIndex("data"))
         val embeddingRow = data.head
-        Some(Vectors.dense(embeddingRow.getSeq[Double](embeddingRow.fieldIndex("embedding")).toArray))
+        Some(Vectors.dense(
+          embeddingRow.getSeq[Double](embeddingRow.fieldIndex("embedding")).toArray))
+      }
+    }
 
     new JSONOutputParser()
       .setDataType(EmbeddingResponse.schema)
