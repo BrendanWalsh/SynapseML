@@ -302,6 +302,8 @@ case class Viewport (
   btmRightPoint: Option[LatLongPairAbbreviated])
 
 object AzureMapsJsonProtocol extends DefaultJsonProtocol {
+  implicit val seqDoubleFormat = seqFormat[Double]
+  implicit val seqStringFormat = seqFormat[String]
   implicit val ErrorAdditionalInfoFormat: RootJsonFormat[ErrorAdditionalInfo] = jsonFormat2(ErrorAdditionalInfo.apply)
   implicit val ErrorDetailFormat: RootJsonFormat[ErrorDetail] = jsonFormat5(ErrorDetail.apply)
   implicit val LRORFormat: RootJsonFormat[LongRunningOperationResult] = jsonFormat6(LongRunningOperationResult.apply)

@@ -33,7 +33,7 @@ object ParamInjections {
       getExecutionContext
     }
 
-    protected def awaitFutures[T](futures: Array[Future[T]]): Seq[T] = {
+    protected def awaitFutures[T](futures: Array[Future[T]])(implicit ct: scala.reflect.ClassTag[T]): Seq[T] = {
       futures.map(ThreadUtils.awaitResult(_, Duration.Inf))
     }
   }

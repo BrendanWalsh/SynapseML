@@ -114,7 +114,7 @@ class VectorSHAPExplainerSuite extends TestBase
 
     val actual: Seq[(Vector, Double)] = shap.transform(testDf).orderBy("x").collect()
       .map {
-        row => (row.getAs[Seq[Vector]]("shaps").head, row.getAs[Vector]("r2")(0))
+        row => (row.getSeq[Vector](row.fieldIndex("shaps")).head, row.getAs[Vector]("r2")(0))
       }
 
     val expected: Seq[(Vector, Double)] = Seq(

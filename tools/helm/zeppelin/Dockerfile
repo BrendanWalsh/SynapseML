@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/openjdk/jdk:11-mariner
+FROM mcr.microsoft.com/openjdk/jdk:17-mariner
 LABEL maintainer="Dalitso Banda dalitsohb@gmail.com"
 
 # Get Spark from US Apache mirror.
@@ -100,7 +100,7 @@ RUN echo "$LOG_TAG install nodejs" && \
     bower install
 
 RUN cd ${Z_HOME}_src && \
-    export MAVEN_OPTS="-Xmx2048m -XX:MaxPermSize=256m" && \
+    export MAVEN_OPTS="-Xmx2048m" && \
     mvn -e -B package -DskipTests -Pscala-2.12 -Pbuild-distr && \
     tar xvf ${Z_HOME}_src/zeppelin-distribution/target/zeppelin-0.9.0-SNAPSHOT.tar.gz && \
     rm -rf ${Z_HOME}/* && \

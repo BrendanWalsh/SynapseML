@@ -1,12 +1,12 @@
-FROM mcr.microsoft.com/oss/mirror/docker.io/library/ubuntu:20.04
+FROM mcr.microsoft.com/oss/mirror/docker.io/library/ubuntu:22.04
 
 ARG SYNAPSEML_VERSION=1.1.0
 ARG DEBIAN_FRONTEND=noninteractive
 
-ENV SPARK_VERSION=3.5.0
+ENV SPARK_VERSION=4.0.0
 ENV HADOOP_VERSION=3
 ENV SYNAPSEML_VERSION=${SYNAPSEML_VERSION}
-ENV JAVA_HOME /usr/lib/jvm/java-1.11.0-openjdk-amd64
+ENV JAVA_HOME /usr/lib/jvm/java-17-openjdk-amd64
 
 # Install required packages
 RUN apt-get -qq update \
@@ -27,7 +27,7 @@ RUN curl -sSL https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64
     && bash /tmp/miniconda.sh -bfp /usr/local \
     && rm -rf /tmp/miniconda.sh \
     && conda update conda \
-    && conda install -y python=3 jupyter pyspark \
+    && conda install -y python=3.12.11 jupyter pyspark \
     && conda clean --all --yes
 
 ENV PATH /opt/conda/bin:$PATH

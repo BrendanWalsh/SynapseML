@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - default
 dependencies:
-  - python=3.11.8
+  - python=3.12.11
   - requests=2.26.0
   - pip=25.2
   - r-base=4.1.1
@@ -12,7 +12,7 @@ dependencies:
   - cmake<=3.27
   - pip:
     - pyarrow==10.0.1
-    - pyspark==3.5.0
+    - pyspark==4.0.0
     - pandas==2.0.3
     - wheel
     - sphinx==5.0.2

@@ -248,12 +248,7 @@ class DistributedHTTPSource(name: String,
     serverInfoConfigured
   }
 
-  private[spark] val serverInfoDFStreaming = {
-    val serializer = infoEnc.createSerializer()
-    val serverInfoConfRDD = serverInfoDF.rdd.map(serializer)
-    sqlContext.sparkSession.internalCreateDataFrame(
-      serverInfoConfRDD, schema, isStreaming = true)
-  }
+  private[spark] val serverInfoDFStreaming = serverInfoDF
 
   @GuardedBy("this")
   protected var currentOffset: LongOffset = new LongOffset(-1)
@@ -319,13 +314,13 @@ class DistributedHTTPSourceProvider extends StreamSourceProvider with DataSource
                             providerName: String,
                             parameters: Map[String, String]): (String, StructType) = {
     if (!parameters.contains("host")) {
-      throw new AnalysisException("Set a host to read from with option(\"host\", ...).")
+      throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY", Map("key" -> "host", "message" -> "Set a host to read from with option(\"host\", ...)"))
     }
     if (!parameters.contains("port")) {
-      throw new AnalysisException("Set a port to read from with option(\"port\", ...).")
+      throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY", Map("key" -> "port", "message" -> "Set a port to read from with option(\"port\", ...)"))
     }
     if (!parameters.contains("path")) {
-      throw new AnalysisException("Set a name of the API which is used for routing")
+      throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY", Map("key" -> "path", "message" -> "Set a name of the API which is used for routing"))
     }
     ("DistributedHTTP", HTTPSourceV2.Schema)
   }
@@ -363,7 +358,7 @@ class DistributedHTTPSink(val options: Map[String, String])
     extends Sink with Logging with Serializable {
 
   if (!options.contains("name")) {
-    throw new AnalysisException("Set a name of an API to reply to")
+    throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY", Map("key" -> "name", "message" -> "Set a name of an API to reply to"))
   }
   override def name: String = options("name")
 

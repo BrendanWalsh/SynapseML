@@ -26,7 +26,7 @@ object DatasetExtensions {
       * @tparam T The type to retrieve.
       * @return The sequence of values in the column.
       */
-    def getColAs[T](colName: String): Seq[T] = {
+    def getColAs[T](colName: String)(implicit ct: scala.reflect.ClassTag[T]): Seq[T] = {
       df.select(colName).collect.map(_.getAs[T](0))
     }
 
