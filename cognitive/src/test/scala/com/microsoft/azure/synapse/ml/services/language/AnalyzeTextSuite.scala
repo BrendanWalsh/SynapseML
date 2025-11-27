@@ -266,8 +266,9 @@ class AnalyzeTextPIISuite extends TransformerFuzzing[AnalyzeText] with TextEndpo
       .withColumn("redactedText", col("documents.redactedText"))
       .withColumn("entities", col("documents.entities.text"))
       .collect()
-    val entities = result.head.getSeq[String](
-      result.schema.fieldIndex("entities"))
+    val headRow = result.head
+    val entitiesIndex = headRow.fieldIndex("entities")
+    val entities = headRow.getSeq[String](entitiesIndex)
     assert(entities.contains("859-98-0987"))
     val redactedText = result(1).getAs[String]("redactedText")
     assert(!redactedText.contains("111000025"))
@@ -279,8 +280,9 @@ class AnalyzeTextPIISuite extends TransformerFuzzing[AnalyzeText] with TextEndpo
       .withColumn("redactedText", col("documents.redactedText"))
       .withColumn("entities", col("documents.entities.text"))
       .collect()
-    val entities = result.head.getSeq[String](
-      result.schema.fieldIndex("entities"))
+    val headRow = result.head
+    val entitiesIndex = headRow.fieldIndex("entities")
+    val entities = headRow.getSeq[String](entitiesIndex)
     assert(entities.contains("859-98-0987"))
     val redactedText = result(1).getAs[String]("redactedText")
     assert(!redactedText.contains("111000025"))
@@ -293,8 +295,9 @@ class AnalyzeTextPIISuite extends TransformerFuzzing[AnalyzeText] with TextEndpo
       .withColumn("entities", col("documents.entities.text"))
       .withColumn("validDocumentsCount", col("response.statistics.validDocumentsCount"))
       .collect()
-    val entities = result.head.getSeq[String](
-      result.schema.fieldIndex("entities"))
+    val headRow = result.head
+    val entitiesIndex = headRow.fieldIndex("entities")
+    val entities = headRow.getSeq[String](entitiesIndex)
     assert(entities.contains("859-98-0987"))
     val redactedText = result(1).getAs[String]("redactedText")
     assert(!redactedText.contains("111000025"))

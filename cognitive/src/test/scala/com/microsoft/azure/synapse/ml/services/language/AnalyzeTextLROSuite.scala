@@ -360,9 +360,9 @@ class SentimentAnalysisLROSuite extends TransformerFuzzing[AnalyzeTextLongRunnin
     assert(result.head.getAs[String]("sentiment") == "positive")
     assert(result(1).getAs[String]("sentiment") == "negative")
     val fromRow = SentimentAssessment.makeFromRowConverter
-    assert(
-      result.head.getSeq[Row](result.schema.fieldIndex("assessments"))
-        .map(fromRow).head.sentiment == "positive")
+    val headRow = result.head
+    val assessmentsIndex = headRow.fieldIndex("assessments")
+    assert(headRow.getSeq[Row](assessmentsIndex).map(fromRow).head.sentiment == "positive")
   }
 
   override def testObjects(): Seq[TestObject[AnalyzeTextLongRunningOperations]] =
@@ -458,8 +458,9 @@ class AnalyzeTextPIILORSuite extends TransformerFuzzing[AnalyzeTextLongRunningOp
                       .withColumn("redactedText", col("documents.redactedText"))
                       .withColumn("entities", col("documents.entities.text"))
                       .collect()
-    val entities = result.head.getSeq[String](
-      result.schema.fieldIndex("entities"))
+    val headRow = result.head
+    val entitiesIndex = headRow.fieldIndex("entities")
+    val entities = headRow.getSeq[String](entitiesIndex)
     assert(entities.contains("859-98-0987"))
     val redactedText = result(1).getAs[String]("redactedText")
     assert(!redactedText.contains("111000025"))
@@ -471,8 +472,9 @@ class AnalyzeTextPIILORSuite extends TransformerFuzzing[AnalyzeTextLongRunningOp
                       .withColumn("redactedText", col("documents.redactedText"))
                       .withColumn("entities", col("documents.entities.text"))
                       .collect()
-    val entities = result.head.getSeq[String](
-      result.schema.fieldIndex("entities"))
+    val headRow = result.head
+    val entitiesIndex = headRow.fieldIndex("entities")
+    val entities = headRow.getSeq[String](entitiesIndex)
     assert(entities.contains("859-98-0987"))
     val redactedText = result(1).getAs[String]("redactedText")
     assert(!redactedText.contains("111000025"))
@@ -485,8 +487,9 @@ class AnalyzeTextPIILORSuite extends TransformerFuzzing[AnalyzeTextLongRunningOp
                       .withColumn("entities", col("documents.entities.text"))
                       .withColumn("validDocumentsCount", col("response.statistics.validDocumentsCount"))
                       .collect()
-    val entities = result.head.getSeq[String](
-      result.schema.fieldIndex("entities"))
+    val headRow = result.head
+    val entitiesIndex = headRow.fieldIndex("entities")
+    val entities = headRow.getSeq[String](entitiesIndex)
     assert(entities.contains("859-98-0987"))
     val redactedText = result(1).getAs[String]("redactedText")
     assert(!redactedText.contains("111000025"))
@@ -638,8 +641,9 @@ class CustomEntityRecognitionSuite extends TransformerFuzzing[AnalyzeTextLongRun
                       .withColumn("documents", col("response.documents"))
                       .withColumn("entities", col("documents.entities"))
                       .collect()
-    val entities = result.head.getSeq[Row](
-      result.schema.fieldIndex("entities"))
+    val headRow = result.head
+    val entitiesIndex = headRow.fieldIndex("entities")
+    val entities = headRow.getSeq[Row](entitiesIndex)
     assert(entities.length == 4)
     val resultMap: Map[String, String] = entities.map { entity =>
       entity.getAs[String]("text") -> entity.getAs[String]("category")
@@ -692,8 +696,9 @@ class MultiLableClassificationSuite extends TransformerFuzzing[AnalyzeTextLongRu
                       .withColumn("documents", col("response.documents"))
                       .withColumn("classifications", col("documents.classifications"))
                       .collect()
-    val classifications = result.head.getSeq[Row](
-      result.schema.fieldIndex("classifications"))
+    val headRow = result.head
+    val classificationsIndex = headRow.fieldIndex("classifications")
+    val classifications = headRow.getSeq[Row](classificationsIndex)
     assert(classifications.nonEmpty)
     assert(classifications.head.getAs[String]("category").nonEmpty)
     assert(classifications.head.getAs[Double]("confidenceScore") > 0.0)

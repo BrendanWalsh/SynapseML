@@ -107,10 +107,13 @@ object ONNXUtils {
     loadTensorBuffer(env, tensorInfo, batchedValues, inferredShape)
   }
 
-  private def validateBatchShapes(batchedValues: Seq[_], expectedShape: Array[Long]): Array[Long] = {
+  private def validateBatchShapes(batchedValues: scala.collection.Seq[_],
+                                  expectedShape: Array[Long]): Array[Long] = {
     // Validate input shape based on first sequence in each parent
     @tailrec
-    def validateOneShape(nestedSeq: Seq[_], currentSize: Array[Long], expectedShape: Array[Long]): Array[Long] = {
+    def validateOneShape(nestedSeq: scala.collection.Seq[_],
+                         currentSize: Array[Long],
+                         expectedShape: Array[Long]): Array[Long] = {
       if (nestedSeq.isEmpty) {
         throw new IllegalArgumentException("Input element dimension is empty")
       }
@@ -217,7 +220,8 @@ object ONNXUtils {
     }
   }
 
-  private def writeNestedSeqToBuffer[T: ClassTag](nestedSeq: Seq[_], bufferWrite: T => Unit): Long = {
+  private def writeNestedSeqToBuffer[T: ClassTag](nestedSeq: scala.collection.Seq[_],
+                                                  bufferWrite: T => Unit): Long = {
     nestedSeq.foldLeft(0: Long) { (cur, element) =>
       element match {
         case x: T =>
@@ -231,11 +235,12 @@ object ONNXUtils {
     }
   }
 
-  private def writeNestedSeqToStringBuffer(nestedSeq: Seq[_], size: Int): ArrayBuffer[String] = {
+  private def writeNestedSeqToStringBuffer(nestedSeq: scala.collection.Seq[_],
+                                           size: Int): ArrayBuffer[String] = {
     var i = 0
     val buffer = ArrayBuffer.fill[String](size)("")
 
-    def innerWrite(nestedSeq: Seq[_]): Unit = {
+    def innerWrite(nestedSeq: scala.collection.Seq[_]): Unit = {
       nestedSeq.foreach {
         case x: String =>
           buffer.update(i, x)
