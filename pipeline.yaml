@@ -114,7 +114,7 @@ jobs:
           sbt genBuildInfo
           echo "##vso[task.uploadsummary]$(pwd)/target/Build.md"
           sbt -DskipCodegen=true publishLocalSigned
-          python tools/esrp/prepare_jar.py
+          # python tools/esrp/prepare_jar.py  # Disabled for Spark 4.0 upgrade
       env:
         NEXUS-UN: $(nexus-un)
         NEXUS-PW: $(nexus-pw)
@@ -325,7 +325,7 @@ jobs:
         set -e
         source activate synapseml
         sbt publishLocalSigned
-        python tools/esrp/prepare_jar.py
+        # python tools/esrp/prepare_jar.py  # Disabled for Spark 4.0 upgrade
       condition: and(eq(variables.isMaster, true), startsWith(variables['tag'], 'v'))
       env:
         STORAGE-KEY: $(storage-key)
@@ -336,21 +336,22 @@ jobs:
         PGP-PW: $(pgp-pw)
         SYNAPSEML_ENABLE_PUBLISH: true
       displayName: 'publish jar package to maven central'
-    - task: EsrpRelease@9
-      inputs:
-        connectedservicename: 'SynapseML-ESRP-Service-Connection'
-        usemanagedidentity: true
-        keyvaultname: 'esrp-kv-ame'
-        signcertname: 'esrp-release-mi-cert'
-        clientid: '1fc1c0d1-5a85-4081-8f1e-12a8c225b9a6'
-        contenttype: maven
-        folderlocation: '/home/vsts/.ivy2/local/com.microsoft.azure/'
-        owners: 'zhoubo@microsoft.com,marcozo@microsoft.com,romanbat@microsoft.com'
-        approvers: 'romanbat@microsoft.com,markus.weimer@microsoft.com,negust@microsoft.com'
-        mainpublisher: synapseml
-        domaintenantid: '33e01921-4d64-4f8c-a055-5bdaffd5e33d'
-      displayName: 'ESRP Publish Package'
-      condition: and(eq(variables.isMaster, true), startsWith(variables['tag'], 'v'))
+    # ESRP disabled for Spark 4.0 upgrade
+    # - task: EsrpRelease@9
+    #   inputs:
+    #     connectedservicename: 'SynapseML-ESRP-Service-Connection'
+    #     usemanagedidentity: true
+    #     keyvaultname: 'esrp-kv-ame'
+    #     signcertname: 'esrp-release-mi-cert'
+    #     clientid: '1fc1c0d1-5a85-4081-8f1e-12a8c225b9a6'
+    #     contenttype: maven
+    #     folderlocation: '/home/vsts/.ivy2/local/com.microsoft.azure/'
+    #     owners: 'zhoubo@microsoft.com,marcozo@microsoft.com,romanbat@microsoft.com'
+    #     approvers: 'romanbat@microsoft.com,markus.weimer@microsoft.com,negust@microsoft.com'
+    #     mainpublisher: synapseml
+    #     domaintenantid: '33e01921-4d64-4f8c-a055-5bdaffd5e33d'
+    #   displayName: 'ESRP Publish Package'
+    #   condition: and(eq(variables.isMaster, true), startsWith(variables['tag'], 'v'))
 
 
 
@@ -394,7 +395,7 @@ jobs:
         scriptType: bash
         inlineScript: |
           source activate synapseml
-          sbt coverage getDatasets installPipPackage
+          sbt getDatasets installPipPackage
           sbt publishM2
     - task: AzureCLI@2
       displayName: 'Test Python Code'
@@ -422,9 +423,9 @@ jobs:
           echo "TEST_SUB_PATH=$TEST_SUB_PATH"
           echo "IGNORE_TEST_PATH_FLAG=$IGNORE_TEST_PATH_FLAG"
           echo "TEST_SUB_PATH_FLAG=$TEST_SUB_PATH_FLAG"
-          (sbt $IGNORE_TEST_PATH_FLAG $TEST_SUB_PATH_FLAG "project $(PACKAGE)" coverage testPython) || \
-          (sbt $IGNORE_TEST_PATH_FLAG $TEST_SUB_PATH_FLAG "project $(PACKAGE)" coverage testPython) || \
-          (sbt $IGNORE_TEST_PATH_FLAG $TEST_SUB_PATH_FLAG "project $(PACKAGE)" coverage testPython)
+          (sbt $IGNORE_TEST_PATH_FLAG $TEST_SUB_PATH_FLAG "project $(PACKAGE)" testPython) || \
+          (sbt $IGNORE_TEST_PATH_FLAG $TEST_SUB_PATH_FLAG "project $(PACKAGE)" testPython) || \
+          (sbt $IGNORE_TEST_PATH_FLAG $TEST_SUB_PATH_FLAG "project $(PACKAGE)" testPython)
     - task: PublishTestResults@2
       displayName: 'Publish Test Results'
       inputs:
@@ -438,7 +439,7 @@ jobs:
         azureSubscription: 'SynapseML Build'
         scriptLocation: inlineScript
         scriptType: bash
-        inlineScript: 'sbt coverageReport'
+        inlineScript: 'echo "Coverage disabled for Spark 4.0 upgrade"'
       condition: succeededOrFailed()
     - template: templates/codecov.yml
 
@@ -499,7 +500,7 @@ jobs:
           set -e
           export SBT_OPTS="-Xms2G -Xmx4G -Xss5M  -Duser.timezone=GMT"
           source activate synapseml
-          timeout 20m sbt -DskipCodegen=true "project $(PACKAGE)" coverage testR
+          timeout 20m sbt -DskipCodegen=true "project $(PACKAGE)" testR
     - task: PublishTestResults@2
       displayName: 'Publish Test Results'
       inputs:
@@ -513,7 +514,7 @@ jobs:
         azureSubscription: 'SynapseML Build'
         scriptLocation: inlineScript
         scriptType: bash
-        inlineScript: 'sbt coverageReport'
+        inlineScript: 'echo "Coverage disabled for Spark 4.0 upgrade"'
       condition: succeededOrFailed()
     - template: templates/codecov.yml
 
@@ -545,7 +546,7 @@ jobs:
         scriptType: bash
         inlineScript: |
           (timeout 5m sbt setup) || (echo "retrying" && timeout 5m sbt setup) || (echo "retrying" && timeout 5m sbt setup)
-          (sbt coverage testWebsiteDocs)
+          (sbt testWebsiteDocs)
     - task: PublishTestResults@2
       displayName: 'Publish Test Results'
       inputs:
@@ -559,7 +560,7 @@ jobs:
         azureSubscription: 'SynapseML Build'
         scriptLocation: inlineScript
         scriptType: bash
-        inlineScript: 'sbt coverageReport'
+        inlineScript: 'echo "Coverage disabled for Spark 4.0 upgrade"'
       condition: succeededOrFailed()
     - template: templates/codecov.yml
 
@@ -751,8 +752,8 @@ jobs:
         inlineScript: |
           ulimit -c unlimited
           export SBT_OPTS="-Xss2M  -Duser.timezone=GMT"
-          (timeout 30m sbt coverage "testOnly com.microsoft.azure.synapse.ml.$(PACKAGE).**") ||
-          (${FLAKY:-false} && timeout 30m sbt coverage "testOnly com.microsoft.azure.synapse.ml.$(PACKAGE).**")
+          (timeout 30m sbt "testOnly com.microsoft.azure.synapse.ml.$(PACKAGE).**") ||
+          (${FLAKY:-false} && timeout 30m sbt "testOnly com.microsoft.azure.synapse.ml.$(PACKAGE).**")
     - task: PublishTestResults@2
       displayName: 'Publish Test Results'
       inputs:
@@ -766,7 +767,7 @@ jobs:
         azureSubscription: 'SynapseML Build'
         scriptLocation: inlineScript
         scriptType: bash
-        inlineScript: 'sbt coverageReport'
+        inlineScript: 'echo "Coverage disabled for Spark 4.0 upgrade"'
       condition: succeededOrFailed()
     - template: templates/kv.yml
     - template: templates/codecov.yml
