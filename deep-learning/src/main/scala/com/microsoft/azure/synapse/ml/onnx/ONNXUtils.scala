@@ -138,7 +138,7 @@ object ONNXUtils {
       }
     }
 
-    val inferredShapes: Seq[Array[Long]] = batchedValues.map {
+    val inferredShapes: scala.collection.Seq[Array[Long]] = batchedValues.map {
       case s: scala.collection.Seq[_] => validateOneShape(s, Array[Long](), expectedShape.tail)
       case _ => Array.empty[Long]
     }

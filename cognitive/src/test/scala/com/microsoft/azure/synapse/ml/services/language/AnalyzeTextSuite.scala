@@ -367,9 +367,9 @@ class SentimentAnalysisSuite extends TransformerFuzzing[AnalyzeText] with TextEn
     assert(result.head.getAs[String]("sentiment") == "positive")
     assert(result(1).getAs[String]("sentiment") == "negative")
     val fromRow = SentimentAssessment.makeFromRowConverter
-    assert(
-      result.head.getSeq[Row](
-        result.schema.fieldIndex("assessments")).map(fromRow).head.sentiment == "positive")
+    val headRow = result.head
+    val assessmentsIndex = headRow.fieldIndex("assessments")
+    assert(headRow.getSeq[Row](assessmentsIndex).map(fromRow).head.sentiment == "positive")
   }
 
   override def testObjects(): Seq[TestObject[AnalyzeText]] =
