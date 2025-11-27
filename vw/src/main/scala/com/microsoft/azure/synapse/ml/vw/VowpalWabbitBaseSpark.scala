@@ -80,7 +80,7 @@ trait VowpalWabbitBaseSpark extends VowpalWabbitBaseLearner
 
     logWarning("Ignoring weights. MultiLabels does not support weights.")
 
-    (row: Row, ex: VowpalWabbitExample) => ex.setMultiLabels(row.getAs[Seq[Int]](labelColIdx).toArray)
+    (row: Row, ex: VowpalWabbitExample) => ex.setMultiLabels(row.getSeq[Int](labelColIdx).toArray)
   }
 
   private def costSensitiveLabelSet(t: T.StructType): VowpalWabbitLabelSetFunc = {
@@ -89,8 +89,8 @@ trait VowpalWabbitBaseSpark extends VowpalWabbitBaseLearner
 
     (row: Row, ex: VowpalWabbitExample) =>
       ex.setCostSensitiveLabels(
-        row.getAs[Seq[Float]](costsIndex).toArray,
-        row.getAs[Seq[Int]](classesIndex).toArray)
+        row.getSeq[Float](costsIndex).toArray,
+        row.getSeq[Int](classesIndex).toArray)
   }
 
   private def contextualBanditLabel(t: T.StructType): VowpalWabbitLabelSetFunc = {
@@ -112,9 +112,9 @@ trait VowpalWabbitBaseSpark extends VowpalWabbitBaseLearner
 
     (row: Row, ex: VowpalWabbitExample) =>
       ex.setContextualBanditContinuousLabel(
-        row.getAs[Seq[Float]](actionsIndex).toArray,
-        row.getAs[Seq[Float]](costIndex).toArray,
-        row.getAs[Seq[Float]](pdfValuesIndex).toArray)
+        row.getSeq[Float](actionsIndex).toArray,
+        row.getSeq[Float](costIndex).toArray,
+        row.getSeq[Float](pdfValuesIndex).toArray)
   }
 
   // scalastyle:off cyclomatic.complexity
