@@ -34,7 +34,9 @@ class EntityLinkingSuite extends TransformerFuzzing[AnalyzeText] with TextEndpoi
     val result = model.transform(df)
       .withColumn("documents", col("response.documents"))
       .withColumn("entityNames", map(col("documents.id"), col("documents.entities.name")))
-    val entities = result.head.getAs[Map[String, Seq[String]]]("entityNames")("0")
+    val entityNames =
+      result.head.getAs[Map[String, scala.collection.Seq[String]]]("entityNames")
+    val entities = entityNames("0")
     assert(entities.contains("Microsoft"))
     assert(entities.contains("Bill Gates"))
   }
@@ -43,7 +45,9 @@ class EntityLinkingSuite extends TransformerFuzzing[AnalyzeText] with TextEndpoi
     val result = model.setApiVersion("2022-10-01-preview").transform(df)
       .withColumn("documents", col("response.documents"))
       .withColumn("entityNames", map(col("documents.id"), col("documents.entities.name")))
-    val entities = result.head.getAs[Map[String, Seq[String]]]("entityNames")("0")
+    val entityNames =
+      result.head.getAs[Map[String, scala.collection.Seq[String]]]("entityNames")
+    val entities = entityNames("0")
     assert(entities.contains("Microsoft"))
     assert(entities.contains("Bill Gates"))
   }
@@ -53,7 +57,9 @@ class EntityLinkingSuite extends TransformerFuzzing[AnalyzeText] with TextEndpoi
       .withColumn("documents", col("response.documents"))
       .withColumn("entityNames", map(col("documents.id"), col("documents.entities.name")))
       .withColumn("validDocumentsCount", col("response.statistics.validDocumentsCount"))
-    val entities = result.head.getAs[Map[String, Seq[String]]]("entityNames")("0")
+    val entityNames =
+      result.head.getAs[Map[String, scala.collection.Seq[String]]]("entityNames")
+    val entities = entityNames("0")
     assert(entities.contains("Microsoft"))
     assert(entities.contains("Bill Gates"))
     assert(result.head.getAs[Int]("validDocumentsCount") == 1)
@@ -89,7 +95,9 @@ class EntityRecognitionSuite extends TransformerFuzzing[AnalyzeText] with TextEn
     val result = model.transform(df)
       .withColumn("documents", col("response.documents"))
       .withColumn("entityNames", map(col("documents.id"), col("documents.entities.text")))
-    val entities = result.head.getAs[Map[String, Seq[String]]]("entityNames")("0")
+    val entityNames =
+      result.head.getAs[Map[String, scala.collection.Seq[String]]]("entityNames")
+    val entities = entityNames("0")
     assert(entities.contains("Microsoft"))
     assert(entities.contains("Bill Gates"))
   }
@@ -98,7 +106,9 @@ class EntityRecognitionSuite extends TransformerFuzzing[AnalyzeText] with TextEn
     val result = model.setApiVersion("2022-10-01-preview").transform(df)
       .withColumn("documents", col("response.documents"))
       .withColumn("entityNames", map(col("documents.id"), col("documents.entities.text")))
-    val entities = result.head.getAs[Map[String, Seq[String]]]("entityNames")("0")
+    val entityNames =
+      result.head.getAs[Map[String, scala.collection.Seq[String]]]("entityNames")
+    val entities = entityNames("0")
     assert(entities.contains("Microsoft"))
     assert(entities.contains("Bill Gates"))
   }
@@ -108,7 +118,9 @@ class EntityRecognitionSuite extends TransformerFuzzing[AnalyzeText] with TextEn
       .withColumn("documents", col("response.documents"))
       .withColumn("entityNames", map(col("documents.id"), col("documents.entities.text")))
       .withColumn("validDocumentsCount", col("response.statistics.validDocumentsCount"))
-    val entities = result.head.getAs[Map[String, Seq[String]]]("entityNames")("0")
+    val entityNames =
+      result.head.getAs[Map[String, scala.collection.Seq[String]]]("entityNames")
+    val entities = entityNames("0")
     assert(entities.contains("Microsoft"))
     assert(entities.contains("Bill Gates"))
     assert(result.head.getAs[Int]("validDocumentsCount") == 1)
