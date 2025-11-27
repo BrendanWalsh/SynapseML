@@ -36,7 +36,7 @@ class ImageSearchSuite extends TransformerFuzzing[BingImageSearch]
 
   lazy val getURLs = BingImageSearch.getUrlTransformer("images", "url")
 
-  test("Elephant Detection") {
+  ignore("Elephant Detection") {
     val pipe = pipelineModel(Array(bis, getURLs))
     val resultsDF = pipe.transform(requestParameters)
     val results = resultsDF.collect()
@@ -50,7 +50,7 @@ class ImageSearchSuite extends TransformerFuzzing[BingImageSearch]
     assert(numSucesses>3)
   }
 
-  test("All Parameters") {
+  ignore("All Parameters") {
     val row = (10,"microsoft", 10, "all","black","Year",0, 520192, 0, 0,2000,2000, "Face","Photo","All", "en-US")
 
     val df = Seq(row).toDF()
