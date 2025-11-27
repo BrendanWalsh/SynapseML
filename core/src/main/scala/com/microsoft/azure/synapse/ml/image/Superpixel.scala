@@ -27,7 +27,7 @@ object SuperpixelData {
   val Schema: DataType = ScalaReflection.schemaFor[SuperpixelData].dataType
 
   def fromRow(r: Row): SuperpixelData = {
-    val clusters = r.getAs[Seq[Seq[Row]]](0)
+    val clusters = r.getSeq[Seq[Row]](0)
     SuperpixelData(clusters.map(cluster => cluster.map(r => (r.getInt(0), r.getInt(1)))))
   }
 

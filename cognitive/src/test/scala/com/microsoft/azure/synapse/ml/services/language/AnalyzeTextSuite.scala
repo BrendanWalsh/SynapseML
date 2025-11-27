@@ -145,7 +145,8 @@ class KeyPhraseSuite extends TransformerFuzzing[AnalyzeText] with TextEndpoint {
     val result = model.transform(df)
       .withColumn("documents", col("response.documents"))
       .withColumn("keyPhrases", col("documents.keyPhrases"))
-    val keyPhrases = result.collect()(1).getAs[Seq[String]]("keyPhrases")
+    val keyPhrases = result.collect()(1).getSeq[String](
+      result.schema.fieldIndex("keyPhrases"))
     assert(keyPhrases.contains("Azure Cognitive Services"))
     assert(keyPhrases.contains("Text Analytics"))
   }
@@ -154,7 +155,8 @@ class KeyPhraseSuite extends TransformerFuzzing[AnalyzeText] with TextEndpoint {
     val result = model.setApiVersion("2022-10-01-preview").transform(df)
       .withColumn("documents", col("response.documents"))
       .withColumn("keyPhrases", col("documents.keyPhrases"))
-    val keyPhrases = result.collect()(1).getAs[Seq[String]]("keyPhrases")
+    val keyPhrases = result.collect()(1).getSeq[String](
+      result.schema.fieldIndex("keyPhrases"))
     assert(keyPhrases.contains("Azure Cognitive Services"))
     assert(keyPhrases.contains("Text Analytics"))
   }
@@ -164,7 +166,8 @@ class KeyPhraseSuite extends TransformerFuzzing[AnalyzeText] with TextEndpoint {
       .withColumn("documents", col("response.documents"))
       .withColumn("keyPhrases", col("documents.keyPhrases"))
       .withColumn("validDocumentsCount", col("response.statistics.validDocumentsCount"))
-    val keyPhrases = result.collect()(1).getAs[Seq[String]]("keyPhrases")
+    val keyPhrases = result.collect()(1).getSeq[String](
+      result.schema.fieldIndex("keyPhrases"))
     assert(keyPhrases.contains("Azure Cognitive Services"))
     assert(keyPhrases.contains("Text Analytics"))
     assert(result.head.getAs[Int]("validDocumentsCount") == 1)
@@ -201,7 +204,8 @@ class LanguageDetectionSuite extends TransformerFuzzing[AnalyzeText] with TextEn
     val result = model.transform(df)
       .withColumn("documents", col("response.documents"))
       .withColumn("detectedLanguage", col("documents.detectedLanguage.name"))
-    val detectedLanguages = result.collect()(1).getAs[Seq[String]]("detectedLanguage")
+    val detectedLanguages = result.collect()(1).getSeq[String](
+      result.schema.fieldIndex("detectedLanguage"))
     assert(detectedLanguages.contains("French"))
     assert(detectedLanguages.contains("Spanish"))
   }
@@ -210,7 +214,8 @@ class LanguageDetectionSuite extends TransformerFuzzing[AnalyzeText] with TextEn
     val result = model.setApiVersion("2022-10-01-preview").transform(df)
       .withColumn("documents", col("response.documents"))
       .withColumn("detectedLanguage", col("documents.detectedLanguage.name"))
-    val detectedLanguages = result.collect()(1).getAs[Seq[String]]("detectedLanguage")
+    val detectedLanguages = result.collect()(1).getSeq[String](
+      result.schema.fieldIndex("detectedLanguage"))
     assert(detectedLanguages.contains("French"))
     assert(detectedLanguages.contains("Spanish"))
   }
@@ -220,10 +225,13 @@ class LanguageDetectionSuite extends TransformerFuzzing[AnalyzeText] with TextEn
       .withColumn("documents", col("response.documents"))
       .withColumn("detectedLanguage", col("documents.detectedLanguage.name"))
       .withColumn("validDocumentsCount", col("response.statistics.validDocumentsCount"))
-    val detectedLanguages = result.collect()(1).getAs[Seq[String]]("detectedLanguage")
+    val detectedLanguages = result.collect()(1).getSeq[String](
+      result.schema.fieldIndex("detectedLanguage"))
     assert(detectedLanguages.contains("French"))
     assert(detectedLanguages.contains("Spanish"))
-    assert(result.collect()(1).getAs[Seq[Int]]("validDocumentsCount") == Seq(3, 3, 3))
+    assert(
+      result.collect()(1).getSeq[Int](
+        result.schema.fieldIndex("validDocumentsCount")) == Seq(3, 3, 3))
   }
 
   override def testObjects(): Seq[TestObject[AnalyzeText]] =
@@ -258,7 +266,8 @@ class AnalyzeTextPIISuite extends TransformerFuzzing[AnalyzeText] with TextEndpo
       .withColumn("redactedText", col("documents.redactedText"))
       .withColumn("entities", col("documents.entities.text"))
       .collect()
-    val entities = result.head.getAs[Seq[String]]("entities")
+    val entities = result.head.getSeq[String](
+      result.schema.fieldIndex("entities"))
     assert(entities.contains("859-98-0987"))
     val redactedText = result(1).getAs[String]("redactedText")
     assert(!redactedText.contains("111000025"))
@@ -270,7 +279,8 @@ class AnalyzeTextPIISuite extends TransformerFuzzing[AnalyzeText] with TextEndpo
       .withColumn("redactedText", col("documents.redactedText"))
       .withColumn("entities", col("documents.entities.text"))
       .collect()
-    val entities = result.head.getAs[Seq[String]]("entities")
+    val entities = result.head.getSeq[String](
+      result.schema.fieldIndex("entities"))
     assert(entities.contains("859-98-0987"))
     val redactedText = result(1).getAs[String]("redactedText")
     assert(!redactedText.contains("111000025"))
@@ -283,7 +293,8 @@ class AnalyzeTextPIISuite extends TransformerFuzzing[AnalyzeText] with TextEndpo
       .withColumn("entities", col("documents.entities.text"))
       .withColumn("validDocumentsCount", col("response.statistics.validDocumentsCount"))
       .collect()
-    val entities = result.head.getAs[Seq[String]]("entities")
+    val entities = result.head.getSeq[String](
+      result.schema.fieldIndex("entities"))
     assert(entities.contains("859-98-0987"))
     val redactedText = result(1).getAs[String]("redactedText")
     assert(!redactedText.contains("111000025"))
@@ -353,7 +364,9 @@ class SentimentAnalysisSuite extends TransformerFuzzing[AnalyzeText] with TextEn
     assert(result.head.getAs[String]("sentiment") == "positive")
     assert(result(1).getAs[String]("sentiment") == "negative")
     val fromRow = SentimentAssessment.makeFromRowConverter
-    assert(result.head.getAs[Seq[Row]]("assessments").map(fromRow).head.sentiment == "positive")
+    assert(
+      result.head.getSeq[Row](
+        result.schema.fieldIndex("assessments")).map(fromRow).head.sentiment == "positive")
   }
 
   override def testObjects(): Seq[TestObject[AnalyzeText]] =

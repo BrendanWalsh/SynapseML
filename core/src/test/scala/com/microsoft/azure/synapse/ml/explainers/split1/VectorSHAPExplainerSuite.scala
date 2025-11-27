@@ -113,8 +113,10 @@ class VectorSHAPExplainerSuite extends TestBase
       .setNumSamples(1000).setBackgroundData(backgroundDf).setModel(model)
 
     val actual: Seq[(Vector, Double)] = shap.transform(testDf).orderBy("x").collect()
-      .map {
-        row => (row.getAs[Seq[Vector]]("shaps").head, row.getAs[Vector]("r2")(0))
+      .map { row =>
+        val shapsIndex = row.schema.fieldIndex("shaps")
+        val r2Index = row.schema.fieldIndex("r2")
+        (row.getSeq[Vector](shapsIndex).head, row.getAs[Vector](r2Index)(0))
       }
 
     val expected: Seq[(Vector, Double)] = Seq(

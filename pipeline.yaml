@@ -420,6 +420,10 @@ jobs:
         scriptLocation: inlineScript
         scriptType: bash
         inlineScript: |
+          if [ -n "${JAVA_HOME_17_X64:-}" ]; then
+            export JAVA_HOME="$JAVA_HOME_17_X64"
+            export PATH="$JAVA_HOME/bin:$PATH"
+          fi
           source activate synapseml
           sbt coverage getDatasets installPipPackage
           sbt publishM2
@@ -433,6 +437,10 @@ jobs:
         scriptType: bash
         inlineScript: |
           set -e
+          if [ -n "${JAVA_HOME_17_X64:-}" ]; then
+            export JAVA_HOME="$JAVA_HOME_17_X64"
+            export PATH="$JAVA_HOME/bin:$PATH"
+          fi
           source activate synapseml
           export SBT_OPTS="$(SBT_OPTS)"
           echo "##vso[task.setvariable variable=SBT_OPTS]$SBT_OPTS"

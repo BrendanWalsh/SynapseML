@@ -123,7 +123,7 @@ object ONNXUtils {
 
       val newSize = currentSize :+ nestedSeq.length.toLong
       nestedSeq.head match {
-        case s: Seq[_] => validateOneShape(s, newSize, expectedShape)
+        case s: scala.collection.Seq[_] => validateOneShape(s, newSize, expectedShape)
         case _ =>
           if (!util.Arrays.equals(newSize, expectedShape)) {
             throw new IllegalArgumentException(
@@ -136,7 +136,7 @@ object ONNXUtils {
     }
 
     val inferredShapes: Seq[Array[Long]] = batchedValues.map {
-      case s: Seq[_] => validateOneShape(s, Array[Long](), expectedShape.tail)
+      case s: scala.collection.Seq[_] => validateOneShape(s, Array[Long](), expectedShape.tail)
       case _ => Array.empty[Long]
     }
 
@@ -218,13 +218,17 @@ object ONNXUtils {
   }
 
   private def writeNestedSeqToBuffer[T: ClassTag](nestedSeq: Seq[_], bufferWrite: T => Unit): Long = {
-    nestedSeq.foldLeft(0: Long) { (cur, element) => element match {
-      case x: T =>
-        bufferWrite(x)
-        cur + 1
-      case s: Seq[_] => cur + writeNestedSeqToBuffer(s, bufferWrite)
-      case _ => cur + 0L
-    }}
+    nestedSeq.foldLeft(0: Long) { (cur, element) =>
+      element match {
+        case x: T =>
+          bufferWrite(x)
+          cur + 1
+        case s: scala.collection.Seq[_] =>
+          cur + writeNestedSeqToBuffer(s, bufferWrite)
+        case _ =>
+          cur + 0L
+      }
+    }
   }
 
   private def writeNestedSeqToStringBuffer(nestedSeq: Seq[_], size: Int): ArrayBuffer[String] = {
@@ -236,7 +240,7 @@ object ONNXUtils {
         case x: String =>
           buffer.update(i, x)
           i = i + 1
-        case s: Seq[_] =>
+        case s: scala.collection.Seq[_] =>
           innerWrite(s)
       }
     }

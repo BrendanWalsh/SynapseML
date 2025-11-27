@@ -691,9 +691,13 @@ class DetectLastMultivariateAnomaly(override val uid: String) extends CognitiveS
   }
 
   protected def prepareEntity: Row => Option[AbstractHttpEntity] = { row =>
-    val timestamps = row.getAs[Seq[String]](s"${getTimestampCol}_list")
+    val timestamps = row.getSeq[String](row.fieldIndex(s"${getTimestampCol}_list"))
     val variables = getInputVariablesCols.map(
-      variable => Variable(timestamps, row.getAs[Seq[Double]](s"${variable}_list"), variable))
+      variable => Variable(
+        timestamps,
+        row.getSeq[Double](row.fieldIndex(s"${variable}_list")),
+        variable
+      ))
     Some(new StringEntity(
       DLMARequest(variables, getTopContributorCount).toJson.compactPrint
     ))

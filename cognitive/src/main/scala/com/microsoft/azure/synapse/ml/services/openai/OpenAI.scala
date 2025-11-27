@@ -394,7 +394,7 @@ trait HasTextOutput {
           row.getAs[String]("content")
         case "array" =>
           // OpenAICompositeMessage: content is Seq[Map[String, Any]]
-          val rawContent = row.getAs[Seq[Map[String, Any]]]("content")
+          val rawContent = row.getSeq[Map[String, Any]](row.fieldIndex("content"))
           rawContent.map(_.map { case (k, v) => k.toString -> v })
         case other =>
           throw new IllegalArgumentException(s"Unsupported content type: $other")

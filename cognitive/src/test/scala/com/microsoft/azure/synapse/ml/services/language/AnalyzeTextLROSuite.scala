@@ -80,11 +80,11 @@ class ExtractiveSummarizationSuite extends TransformerFuzzing[AnalyzeTextLongRun
                          .collect()
     assert(responses.length == 1)
     val response = responses.head
-    val documents = response.getAs[Seq[Row]]("documents")
-    val errors = response.getAs[Seq[Row]]("errors")
+    val documents = response.getSeq[Row](response.fieldIndex("documents"))
+    val errors = response.getSeq[Row](response.fieldIndex("errors"))
     assert(documents.length == errors.length)
     assert(documents.length == 3)
-    val sentences = documents.head.getAs[Seq[Row]]("sentences")
+    val sentences = documents.head.getSeq[Row](documents.head.fieldIndex("sentences"))
     assert(sentences.nonEmpty)
     sentences.foreach { sentence =>
       assert(sentence.getAs[String]("text").nonEmpty)
@@ -115,7 +115,7 @@ class ExtractiveSummarizationSuite extends TransformerFuzzing[AnalyzeTextLongRun
                          .collect()
     assert(responses.length == 1)
     val response = responses.head
-    val stats = response.getAs[Seq[Row]]("statistics")
+    val stats = response.getSeq[Row](response.fieldIndex("statistics"))
     assert(stats.length == 3)
     stats.foreach { stat =>
       assert(stat.getAs[Int]("documentsCount") == 3)
@@ -124,10 +124,10 @@ class ExtractiveSummarizationSuite extends TransformerFuzzing[AnalyzeTextLongRun
       assert(stat.getAs[Int]("transactionsCount") == 3)
     }
 
-    val documents = response.getAs[Seq[Row]]("documents")
+    val documents = response.getSeq[Row](response.fieldIndex("documents"))
     for (document <- documents) {
       if (document != null) {
-        val sentences = document.getAs[Seq[Row]]("sentences")
+        val sentences = document.getSeq[Row](document.fieldIndex("sentences"))
         assert(sentences.length == sentenceCount)
         sentences.foreach { sentence =>
           assert(sentence.getAs[String]("text").nonEmpty)
@@ -201,11 +201,11 @@ class AbstractiveSummarizationSuite extends TransformerFuzzing[AnalyzeTextLongRu
                          .collect()
     assert(responses.length == 1)
     val response = responses.head
-    val documents = response.getAs[Seq[Row]]("documents")
-    val errors = response.getAs[Seq[Row]]("errors")
+    val documents = response.getSeq[Row](response.fieldIndex("documents"))
+    val errors = response.getSeq[Row](response.fieldIndex("errors"))
     assert(documents.length == errors.length)
     assert(documents.length == 1)
-    val summaries = documents.head.getAs[Seq[Row]]("summaries")
+    val summaries = documents.head.getSeq[Row](documents.head.fieldIndex("summaries"))
     assert(summaries.nonEmpty)
   }
 
@@ -231,14 +231,14 @@ class AbstractiveSummarizationSuite extends TransformerFuzzing[AnalyzeTextLongRu
                          .collect()
     assert(responses.length == 1)
     val response = responses.head
-    val stat = response.getAs[Seq[Row]]("statistics").head
+    val stat = response.getSeq[Row](response.fieldIndex("statistics")).head
     assert(stat.getAs[Int]("documentsCount") == 1)
     assert(stat.getAs[Int]("validDocumentsCount") == 1)
     assert(stat.getAs[Int]("erroneousDocumentsCount") == 0)
 
 
-    val document = response.getAs[Seq[Row]]("documents").head
-    val summaries = document.getAs[Seq[Row]]("summaries")
+    val document = response.getSeq[Row](response.fieldIndex("documents")).head
+    val summaries = document.getSeq[Row](document.fieldIndex("summaries"))
     assert(summaries.length == 1)
     val summary = summaries.head.getAs[String]("text")
     assert(summary.length <= 750)
@@ -360,7 +360,9 @@ class SentimentAnalysisLROSuite extends TransformerFuzzing[AnalyzeTextLongRunnin
     assert(result.head.getAs[String]("sentiment") == "positive")
     assert(result(1).getAs[String]("sentiment") == "negative")
     val fromRow = SentimentAssessment.makeFromRowConverter
-    assert(result.head.getAs[Seq[Row]]("assessments").map(fromRow).head.sentiment == "positive")
+    assert(
+      result.head.getSeq[Row](result.schema.fieldIndex("assessments"))
+        .map(fromRow).head.sentiment == "positive")
   }
 
   override def testObjects(): Seq[TestObject[AnalyzeTextLongRunningOperations]] =
@@ -395,7 +397,8 @@ class KeyPhraseLROSuite extends TransformerFuzzing[AnalyzeTextLongRunningOperati
     val result = model.transform(df)
                       .withColumn("documents", col("response.documents"))
                       .withColumn("keyPhrases", col("documents.keyPhrases"))
-    val keyPhrases = result.collect()(1).getAs[Seq[String]]("keyPhrases")
+    val keyPhrases = result.collect()(1).getSeq[String](
+      result.schema.fieldIndex("keyPhrases"))
     assert(keyPhrases.contains("Azure Cognitive Services"))
     assert(keyPhrases.contains("Text Analytics"))
   }
@@ -404,7 +407,8 @@ class KeyPhraseLROSuite extends TransformerFuzzing[AnalyzeTextLongRunningOperati
     val result = model.setApiVersion("2022-10-01-preview").transform(df)
                       .withColumn("documents", col("response.documents"))
                       .withColumn("keyPhrases", col("documents.keyPhrases"))
-    val keyPhrases = result.collect()(1).getAs[Seq[String]]("keyPhrases")
+    val keyPhrases = result.collect()(1).getSeq[String](
+      result.schema.fieldIndex("keyPhrases"))
     assert(keyPhrases.contains("Azure Cognitive Services"))
     assert(keyPhrases.contains("Text Analytics"))
   }
@@ -414,7 +418,8 @@ class KeyPhraseLROSuite extends TransformerFuzzing[AnalyzeTextLongRunningOperati
                       .withColumn("documents", col("response.documents"))
                       .withColumn("keyPhrases", col("documents.keyPhrases"))
                       .withColumn("validDocumentsCount", col("response.statistics.validDocumentsCount"))
-    val keyPhrases = result.collect()(1).getAs[Seq[String]]("keyPhrases")
+    val keyPhrases = result.collect()(1).getSeq[String](
+      result.schema.fieldIndex("keyPhrases"))
     assert(keyPhrases.contains("Azure Cognitive Services"))
     assert(keyPhrases.contains("Text Analytics"))
     assert(result.head.getAs[Int]("validDocumentsCount") == 1)
@@ -453,7 +458,8 @@ class AnalyzeTextPIILORSuite extends TransformerFuzzing[AnalyzeTextLongRunningOp
                       .withColumn("redactedText", col("documents.redactedText"))
                       .withColumn("entities", col("documents.entities.text"))
                       .collect()
-    val entities = result.head.getAs[Seq[String]]("entities")
+    val entities = result.head.getSeq[String](
+      result.schema.fieldIndex("entities"))
     assert(entities.contains("859-98-0987"))
     val redactedText = result(1).getAs[String]("redactedText")
     assert(!redactedText.contains("111000025"))
@@ -465,7 +471,8 @@ class AnalyzeTextPIILORSuite extends TransformerFuzzing[AnalyzeTextLongRunningOp
                       .withColumn("redactedText", col("documents.redactedText"))
                       .withColumn("entities", col("documents.entities.text"))
                       .collect()
-    val entities = result.head.getAs[Seq[String]]("entities")
+    val entities = result.head.getSeq[String](
+      result.schema.fieldIndex("entities"))
     assert(entities.contains("859-98-0987"))
     val redactedText = result(1).getAs[String]("redactedText")
     assert(!redactedText.contains("111000025"))
@@ -478,7 +485,8 @@ class AnalyzeTextPIILORSuite extends TransformerFuzzing[AnalyzeTextLongRunningOp
                       .withColumn("entities", col("documents.entities.text"))
                       .withColumn("validDocumentsCount", col("response.statistics.validDocumentsCount"))
                       .collect()
-    val entities = result.head.getAs[Seq[String]]("entities")
+    val entities = result.head.getSeq[String](
+      result.schema.fieldIndex("entities"))
     assert(entities.contains("859-98-0987"))
     val redactedText = result(1).getAs[String]("redactedText")
     assert(!redactedText.contains("111000025"))
@@ -630,7 +638,8 @@ class CustomEntityRecognitionSuite extends TransformerFuzzing[AnalyzeTextLongRun
                       .withColumn("documents", col("response.documents"))
                       .withColumn("entities", col("documents.entities"))
                       .collect()
-    val entities = result.head.getAs[Seq[Row]]("entities")
+    val entities = result.head.getSeq[Row](
+      result.schema.fieldIndex("entities"))
     assert(entities.length == 4)
     val resultMap: Map[String, String] = entities.map { entity =>
       entity.getAs[String]("text") -> entity.getAs[String]("category")
@@ -683,7 +692,8 @@ class MultiLableClassificationSuite extends TransformerFuzzing[AnalyzeTextLongRu
                       .withColumn("documents", col("response.documents"))
                       .withColumn("classifications", col("documents.classifications"))
                       .collect()
-    val classifications = result.head.getAs[Seq[Row]]("classifications")
+    val classifications = result.head.getSeq[Row](
+      result.schema.fieldIndex("classifications"))
     assert(classifications.nonEmpty)
     assert(classifications.head.getAs[String]("category").nonEmpty)
     assert(classifications.head.getAs[Double]("confidenceScore") > 0.0)
@@ -695,6 +705,3 @@ class MultiLableClassificationSuite extends TransformerFuzzing[AnalyzeTextLongRu
 
   override def reader: MLReadable[_] = AnalyzeText
 }
-
-
-

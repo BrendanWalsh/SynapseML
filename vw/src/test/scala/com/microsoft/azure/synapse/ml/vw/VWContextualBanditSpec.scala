@@ -133,7 +133,8 @@ class VWContextualBandidSpec extends TestBase with EstimatorFuzzing[VowpalWabbit
       .setInputCols(Array("col1", "col2"))
       .setOutputCol("combined_things")
     val transformedDf = sequencer.transform(df)
-    val result = transformedDf.collect.head.getAs[Seq[String]]("combined_things")
+    val result = transformedDf.collect.head.getSeq[String](
+      transformedDf.schema.fieldIndex("combined_things"))
     assert(result == Seq("thing1", "thing2"))
   }
 

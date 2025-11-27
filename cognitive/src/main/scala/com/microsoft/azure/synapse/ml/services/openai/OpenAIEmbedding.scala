@@ -51,7 +51,9 @@ class OpenAIEmbedding (override val uid: String) extends OpenAIServicesBase(uid)
       if (r == null)
         None
       else
-        Some(Vectors.dense(r.getAs[Seq[Row]]("data").head.getAs[Seq[Double]]("embedding").toArray))
+        val data = r.getSeq[Row](r.fieldIndex("data"))
+        val embeddingRow = data.head
+        Some(Vectors.dense(embeddingRow.getSeq[Double](embeddingRow.fieldIndex("embedding")).toArray))
 
     new JSONOutputParser()
       .setDataType(EmbeddingResponse.schema)

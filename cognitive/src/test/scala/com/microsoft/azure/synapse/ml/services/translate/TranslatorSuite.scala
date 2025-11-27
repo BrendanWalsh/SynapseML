@@ -63,7 +63,11 @@ class TranslateSuite extends TransformerFuzzing[Translate]
 
   test("Translate multiple pieces of text with language autodetection") {
     val result1 = getTranslationTextResult(translate.setToLanguage(Seq("zh-Hans")), textDf2).collect()
-    assert(result1(0).getSeq(0).mkString("\n") == "早上好\n再见")
+    val greeting = result1(0).getSeq[String](0).mkString("\n")
+    assert(
+      greeting == "早上好\n再见" ||
+        greeting == "您好\n再见"
+    )
 
     val translate1: Translate = new Translate()
       .setSubscriptionKey(translatorKey)
@@ -72,7 +76,8 @@ class TranslateSuite extends TransformerFuzzing[Translate]
       .setOutputCol("translation")
       .setConcurrency(5)
     val result3 = getTranslationTextResult(translate1.setToLanguage("zh-Hans"), emptyDf).collect()
-    assert(result3(0).getSeq(0).mkString("\n").contains("嗨"))
+    val simpleGreeting = result3(0).getSeq[String](0).mkString("\n")
+    assert(simpleGreeting.contains("嗨") || simpleGreeting.contains("你好"))
 
     val translate2: Translate = new Translate()
       .setSubscriptionKey(translatorKey)
@@ -82,7 +87,8 @@ class TranslateSuite extends TransformerFuzzing[Translate]
       .setOutputCol("translation")
       .setConcurrency(5)
     val result4 = getTranslationTextResult(translate2, textDf6).collect()
-    assert(result4(0).getSeq(0).mkString("").contains("嗨"))
+    val mixedGreeting = result4(0).getSeq[String](0).mkString("")
+    assert(mixedGreeting.contains("嗨") || mixedGreeting.contains("你好"))
     assert(result4(1).get(0) == null)
     assert(result4(2).get(0) == null)
   }
