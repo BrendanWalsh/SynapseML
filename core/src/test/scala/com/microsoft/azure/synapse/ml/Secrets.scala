@@ -17,8 +17,8 @@ object Secrets {
   protected def exec(command: String): String = {
     val os = sys.props("os.name").toLowerCase
     os match {
-      case x if x contains "windows" => (Seq("cmd", "/C") ++ Seq(command))!!
-      case _ => Seq(command)!!
+      case x if x contains "windows" => (Seq("cmd", "/C") ++ Seq(command)).!!
+      case _ => command.!!
     }
   }
 
