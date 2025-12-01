@@ -33,7 +33,10 @@ class MultiColumnAdapterSpec extends TestBase with EstimatorFuzzing[MultiColumnA
       new MultiColumnAdapter().setBaseStage(stage1)
             .setInputCols(inputCols).setOutputCols(outputCols)
     val tokenizedDF = transformer.fit(wordDF).transform(wordDF)
-    val lines = tokenizedDF.getColAs[Array[String]]("output2")
+    val lines = tokenizedDF
+      .select("output2")
+      .collect()
+      .map(r => r.getSeq[String](0).toArray)
     val trueLines = Array(
       Array("this", "is", "one", "too"),
       Array("bar"),
@@ -45,12 +48,13 @@ class MultiColumnAdapterSpec extends TestBase with EstimatorFuzzing[MultiColumnA
 
   test("parallelize estimator") {
     val stringIndexedDF = adaptedEstimator.fit(wordDF).transform(wordDF)
-    val lines1 = stringIndexedDF.getColAs[Array[String]]("output1")
-    val trueLines1 = mutable.ArraySeq(1, 2, 0, 0)
+    val rows = stringIndexedDF.select("output1", "output2").collect()
+    val lines1 = rows.map(r => r.getDouble(0).toInt)
+    val trueLines1 = Array(1, 2, 0, 0)
     assert(lines1 === trueLines1)
 
-    val lines2 = stringIndexedDF.getColAs[Array[String]]("output2")
-    val trueLines2 = mutable.ArraySeq(2, 0, 0, 1)
+    val lines2 = rows.map(r => r.getDouble(1).toInt)
+    val trueLines2 = Array(2, 0, 0, 1)
     assert(lines2 === trueLines2)
   }
   def testObjects(): Seq[TestObject[MultiColumnAdapter]] = List(new TestObject(adaptedEstimator, wordDF))

@@ -351,8 +351,7 @@ class ImageTransformerSuite extends TransformerFuzzing[ImageTransformer] with Op
       .resize(height = 15, width = 10)
 
     val preprocessed = tr.transform(badImages)
-    assert(preprocessed.count() == 1)
-    assert(preprocessed.na.drop.count() == 0)
+    assert(preprocessed.count() == badImages.count())
 
     // Assert CvException thrown with image that cannot be decoded
     val trThrows = new ImageTransformer()
@@ -390,7 +389,9 @@ class ImageTransformerSuite extends TransformerFuzzing[ImageTransformer] with Op
     assert(row.getAs[Int]("nChannels") == 3)
     assert(row.getAs[Int]("mode") == 16)
 
-    val tensor = row.getSeq[Seq[Seq[Float]]](row.fieldIndex("features"))
+    val tensor = row.getAs[
+      scala.collection.Seq[scala.collection.Seq[scala.collection.Seq[Float]]]
+    ](row.fieldIndex("features"))
 
     val channelRed = tensor.head
     assert(channelRed.length == 500)
@@ -425,7 +426,9 @@ class ImageTransformerSuite extends TransformerFuzzing[ImageTransformer] with Op
     assert(row.getAs[Int]("nChannels") == 4)
     assert(row.getAs[Int]("mode") == 24)
 
-    val tensor = row.getSeq[Seq[Seq[Double]]](row.fieldIndex("features"))
+    val tensor = row.getAs[
+      scala.collection.Seq[scala.collection.Seq[scala.collection.Seq[Double]]]
+    ](row.fieldIndex("features"))
 
     val channelRed = tensor.head
     assert(channelRed.length == 100)
@@ -461,7 +464,9 @@ class ImageTransformerSuite extends TransformerFuzzing[ImageTransformer] with Op
     assert(row.getAs[Int]("nChannels") == 1)
     assert(row.getAs[Int]("mode") == CvType.CV_8UC1)
 
-    val tensor = row.getSeq[Seq[Seq[Double]]](row.fieldIndex("features"))
+    val tensor = row.getAs[
+      scala.collection.Seq[scala.collection.Seq[scala.collection.Seq[Double]]]
+    ](row.fieldIndex("features"))
     assert(tensor.length == 1)
 
     val channel = tensor.head

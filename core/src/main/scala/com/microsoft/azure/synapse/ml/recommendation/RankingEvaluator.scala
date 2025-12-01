@@ -133,7 +133,11 @@ class RankingEvaluator(override val uid: String)
   def getMetrics(dataset: Dataset[_]): AdvancedRankingMetrics = {
     val predictionAndLabels = dataset
       .select(getPredictionCol, getLabelCol)
-      .rdd.map { case Row(prediction: Seq[Any], label: Seq[Any]) => (prediction.toArray, label.toArray) }
+      .rdd.map { row =>
+        val prediction = row.getSeq[Any](0).toArray
+        val label = row.getSeq[Any](1).toArray
+        (prediction, label)
+      }
       .cache()
 
     new AdvancedRankingMetrics(predictionAndLabels, getK, getNItems)

@@ -519,6 +519,10 @@ jobs:
         scriptType: bash
         inlineScript: |
           set -e
+          if [ -n "${JAVA_HOME_17_X64:-}" ]; then
+            export JAVA_HOME="$JAVA_HOME_17_X64"
+            export PATH="$JAVA_HOME/bin:$PATH"
+          fi
           export SBT_OPTS="$(SBT_OPTS)"
           source activate synapseml
           (timeout 5m sbt setup) || (echo "retrying" && timeout 5m sbt setup) || (echo "retrying" && timeout 5m sbt setup)
@@ -538,6 +542,10 @@ jobs:
         scriptType: bash
         inlineScript: |
           set -e
+          if [ -n "${JAVA_HOME_17_X64:-}" ]; then
+            export JAVA_HOME="$JAVA_HOME_17_X64"
+            export PATH="$JAVA_HOME/bin:$PATH"
+          fi
           export SBT_OPTS="$(SBT_OPTS)"
           source activate synapseml
           timeout 20m sbt -DskipCodegen=true "project $(PACKAGE)" coverage testR
