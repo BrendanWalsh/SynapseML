@@ -32,11 +32,11 @@ object ServiceParamJsonProtocol extends DefaultJsonProtocol {
 }
 
 class JsonEncodableParam[T](parent: Params, name: String, doc: String, isValid: T => Boolean)
-                           (@transient implicit val format: JsonFormat[T], ct: scala.reflect.ClassTag[T])
-  extends Param[T](parent, name, doc, isValid)(ct) {
+                           (@transient implicit val format: JsonFormat[T])
+  extends Param[T](parent, name, doc, isValid) {
 
-  def this(parent: Params, name: String, doc: String)(implicit format: JsonFormat[T], ct: scala.reflect.ClassTag[T]) =
-    this(parent, name, doc, (_: T) => true)(format, ct)
+  def this(parent: Params, name: String, doc: String)(implicit format: JsonFormat[T]) =
+    this(parent, name, doc, (_: T) => true)
 
   override def jsonEncode(value: T): String = {
     value.toJson.compactPrint
@@ -129,12 +129,12 @@ class ServiceParam[T: TypeTag](parent: Params,
 }
 
 // Use this class if you want to extend JsonEncodableParam for Cognitive services param
-class CognitiveServiceStructParam[T: TypeTag: scala.reflect.ClassTag](parent: Params,
+class CognitiveServiceStructParam[T: TypeTag](parent: Params,
                                               name: String,
                                               doc: String,
                                               isValid: T => Boolean = (_: T) => true)
                                              (@transient implicit val dataFormat: JsonFormat[T])
-  extends JsonEncodableParam[T](parent, name, doc, isValid)(dataFormat, implicitly[scala.reflect.ClassTag[T]])
+  extends JsonEncodableParam[T](parent, name, doc, isValid)
     with WrappableParam[T] {
 
   override def pyValue(v: T): String = PythonWrappableParam.pyDefaultRender(v)
