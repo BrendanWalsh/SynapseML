@@ -251,6 +251,7 @@ val settings = Seq(
   Test / publishArtifact := true,
   Test / fork := true,
   Test / javaOptions ++= Seq(
+    "--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED",
     "--add-opens=java.base/java.lang=ALL-UNNAMED",
     "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED",
     "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
