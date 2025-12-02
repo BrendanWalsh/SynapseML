@@ -482,7 +482,7 @@ jobs:
           export SBT_OPTS="-Xms2G -Xss5M  -Duser.timezone=GMT"
           export JAVA_TOOL_OPTIONS="--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED"
           source activate synapseml
-          (timeout 5m sbt setup) || (echo "retrying" && timeout 5m sbt setup) || (echo "retrying" && timeout 5m sbt setup)
+          (timeout 5m sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED setup) || (echo "retrying" && timeout 5m sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED setup) || (echo "retrying" && timeout 5m sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED setup)
           sbt codegen
           sbt publishM2
           SPARK_VERSION=4.0.1
@@ -502,7 +502,7 @@ jobs:
           export SBT_OPTS="-Xms2G -Xmx4G -Xss5M  -Duser.timezone=GMT"
           export JAVA_TOOL_OPTIONS="--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED"
           source activate synapseml
-          timeout 20m sbt -DskipCodegen=true "project $(PACKAGE)" testR
+          timeout 20m sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED -DskipCodegen=true "project $(PACKAGE)" testR
     - task: PublishTestResults@2
       displayName: 'Publish Test Results'
       inputs:
