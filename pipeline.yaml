@@ -395,8 +395,8 @@ jobs:
         scriptType: bash
         inlineScript: |
           source activate synapseml
-          sbt getDatasets installPipPackage
-          sbt publishM2
+          sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED getDatasets installPipPackage
+          sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED publishM2
     - task: AzureCLI@2
       displayName: 'Test Python Code'
       retryCountOnTaskFailure: 1
@@ -423,9 +423,9 @@ jobs:
           echo "TEST_SUB_PATH=$TEST_SUB_PATH"
           echo "IGNORE_TEST_PATH_FLAG=$IGNORE_TEST_PATH_FLAG"
           echo "TEST_SUB_PATH_FLAG=$TEST_SUB_PATH_FLAG"
-          (sbt $IGNORE_TEST_PATH_FLAG $TEST_SUB_PATH_FLAG "project $(PACKAGE)" testPython) || \
-          (sbt $IGNORE_TEST_PATH_FLAG $TEST_SUB_PATH_FLAG "project $(PACKAGE)" testPython) || \
-          (sbt $IGNORE_TEST_PATH_FLAG $TEST_SUB_PATH_FLAG "project $(PACKAGE)" testPython)
+          (sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED $IGNORE_TEST_PATH_FLAG $TEST_SUB_PATH_FLAG "project $(PACKAGE)" testPython) || \
+          (sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED $IGNORE_TEST_PATH_FLAG $TEST_SUB_PATH_FLAG "project $(PACKAGE)" testPython) || \
+          (sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED $IGNORE_TEST_PATH_FLAG $TEST_SUB_PATH_FLAG "project $(PACKAGE)" testPython)
     - task: PublishTestResults@2
       displayName: 'Publish Test Results'
       inputs:
@@ -547,8 +547,8 @@ jobs:
         scriptLocation: inlineScript
         scriptType: bash
         inlineScript: |
-          (timeout 5m sbt setup) || (echo "retrying" && timeout 5m sbt setup) || (echo "retrying" && timeout 5m sbt setup)
-          (sbt testWebsiteDocs)
+          (timeout 5m sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED setup) || (echo "retrying" && timeout 5m sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED setup) || (echo "retrying" && timeout 5m sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED setup)
+          (sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED testWebsiteDocs)
     - task: PublishTestResults@2
       displayName: 'Publish Test Results'
       inputs:
@@ -590,7 +590,7 @@ jobs:
         scriptType: bash
         inlineScript: |
           source activate synapseml
-          sbt convertNotebooks
+          sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED convertNotebooks
     - bash: |
         set -e
         yarn install
@@ -742,7 +742,7 @@ jobs:
           (${FFMPEG:-false} && sudo apt-get update && \
           sudo apt-get install ffmpeg libgstreamer1.0-0 \
           gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-ugly -y)
-          (timeout 5m sbt setup) || (echo "retrying" && timeout 5m sbt setup) || (echo "retrying" && timeout 5m sbt setup)
+          (timeout 5m sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED setup) || (echo "retrying" && timeout 5m sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED setup) || (echo "retrying" && timeout 5m sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED setup)
     - task: AzureCLI@2
       displayName: 'Unit Test'
       retryCountOnTaskFailure: 1
@@ -754,8 +754,8 @@ jobs:
         inlineScript: |
           ulimit -c unlimited
           export SBT_OPTS="-Xss2M  -Duser.timezone=GMT"
-          (timeout 30m sbt "testOnly com.microsoft.azure.synapse.ml.$(PACKAGE).**") ||
-          (${FLAKY:-false} && timeout 30m sbt "testOnly com.microsoft.azure.synapse.ml.$(PACKAGE).**")
+          (timeout 30m sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED "testOnly com.microsoft.azure.synapse.ml.$(PACKAGE).**") ||
+          (${FLAKY:-false} && timeout 30m sbt -J--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED "testOnly com.microsoft.azure.synapse.ml.$(PACKAGE).**")
     - task: PublishTestResults@2
       displayName: 'Publish Test Results'
       inputs:
