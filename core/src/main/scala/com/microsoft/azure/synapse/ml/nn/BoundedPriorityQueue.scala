@@ -10,7 +10,7 @@ Original file: https://github.com/apache/spark/core/src/main/scala/org/apache/sp
 
 import java.io.Serializable
 import java.util.{PriorityQueue => JPriorityQueue}
-import scala.collection.mutable.Growable
+import scala.collection.generic.Growable
 
 /**
   * Bounded priority queue. This class wraps the original PriorityQueue
@@ -20,7 +20,7 @@ import scala.collection.mutable.Growable
 class BoundedPriorityQueue[A](maxSize: Int)(implicit ord: Ordering[A])
   extends Iterable[A] with Growable[A] with Serializable {
 
-  import scala.jdk.CollectionConverters._
+  import scala.collection.JavaConverters._
 
   private val underlying = new JPriorityQueue[A](maxSize, ord)
 
@@ -28,10 +28,15 @@ class BoundedPriorityQueue[A](maxSize: Int)(implicit ord: Ordering[A])
 
   override def size: Int = underlying.size
 
-  override def knownSize: Int = underlying.size()
-
   //scalastyle:off method.name
-  // Scala 2.13: Growable trait requires implementing addOne instead of overriding final += methods
+  //scalastyle:off method.name
+  override def addAll(xs: IterableOnce[A]): this.type = {
+    xs.iterator.foreach {
+      this.addOne(_)
+    }
+    this
+  }
+
   override def addOne(elem: A): this.type = {
     if (size < maxSize) {
       underlying.offer(elem)
@@ -40,6 +45,8 @@ class BoundedPriorityQueue[A](maxSize: Int)(implicit ord: Ordering[A])
     }
     this
   }
+
+  override def knownSize: Int = size
   //scalastyle:on method.name
 
   override def clear(): Unit = {

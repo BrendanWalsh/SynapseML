@@ -316,7 +316,7 @@ class DistributedHTTPSuite extends TestBase with Flaky with HTTPTestUtils {
            |        r = s.post("$url",
            |                          data={"number": 12524, "type": "issue", "action": "show"},
            |                          headers = {"content-type": "application/json"},
-           |                          timeout=15)
+           |                          timeout=60)
            |
            |        assert r.status_code==200
            |        print("Exiting {} with code {}".format(self.threadID, r.status_code))

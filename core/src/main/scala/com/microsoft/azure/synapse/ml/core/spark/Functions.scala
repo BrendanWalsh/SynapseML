@@ -86,5 +86,5 @@ class PEP3101Parser(val expr: String) {
 
 object Functions {
   def template(expr: String): Column =
-    F.concat(new PEP3101Parser(expr).parse: _*)
+    F.concat(new PEP3101Parser(expr).parse.toSeq: _*)
 }

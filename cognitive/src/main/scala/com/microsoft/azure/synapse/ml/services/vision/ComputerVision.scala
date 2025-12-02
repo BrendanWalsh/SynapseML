@@ -26,7 +26,7 @@ import spray.json._
 
 import java.net.URI
 import java.util.concurrent.TimeoutException
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.concurrent.blocking
 import scala.language.existentials
 

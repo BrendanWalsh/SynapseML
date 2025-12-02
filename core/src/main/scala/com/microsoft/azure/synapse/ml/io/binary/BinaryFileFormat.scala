@@ -192,7 +192,7 @@ private[ml] class HadoopFileReader(file: PartitionedFile,
                                       seed: Long)
   extends Iterator[(String, Array[Byte])] with Closeable {
 
-  private val recordIterator = {
+  private val internalIterator = {
     val fileSplit = new FileSplit(
       new Path(new URI(file.filePath.toString())),
       file.start,
@@ -205,11 +205,11 @@ private[ml] class HadoopFileReader(file: PartitionedFile,
     new KeyValueReaderIterator(reader)
   }
 
-  override def hasNext: Boolean = recordIterator.hasNext
+  override def hasNext: Boolean = internalIterator.hasNext
 
-  override def next(): (String, Array[Byte]) = recordIterator.next()
+  override def next(): (String, Array[Byte]) = internalIterator.next()
 
-  override def close(): Unit = recordIterator.close()
+  override def close(): Unit = internalIterator.close()
 
 }
 

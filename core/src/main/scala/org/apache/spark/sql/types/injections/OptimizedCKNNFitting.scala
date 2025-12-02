@@ -11,10 +11,11 @@ import org.apache.spark.sql.Dataset
 import org.apache.spark.sql.catalyst.types.PhysicalDataType
 import org.apache.spark.sql.types._
 
+import scala.reflect.ClassTag
+
 trait OptimizedCKNNFitting extends ConditionalKNNParams with SynapseMLLogging {
 
-  private def fitGeneric[V, L](dataset: Dataset[_])(
-      implicit ctV: scala.reflect.ClassTag[V], ctL: scala.reflect.ClassTag[L]): ConditionalKNNModel = {
+  private def fitGeneric[V: ClassTag, L: ClassTag](dataset: Dataset[_]): ConditionalKNNModel = {
 
     val kvlTriples = dataset.toDF().select(getFeaturesCol, getValuesCol, getLabelCol).collect()
       .map { row =>
@@ -36,15 +37,34 @@ trait OptimizedCKNNFitting extends ConditionalKNNParams with SynapseMLLogging {
   }
 
   protected def fitOptimized(dataset: Dataset[_]): ConditionalKNNModel = {
-    // Use Any for type parameters due to path-dependent type ClassTag limitations
-    fitGeneric[Any, Any](dataset)
+
+    val vt = PhysicalDataType.apply(dataset.schema(getValuesCol).dataType)
+    val lt = PhysicalDataType.apply(dataset.schema(getLabelCol).dataType)
+    (vt, lt) match {
+      case (avt: PhysicalDataType, alt: PhysicalDataType) =>
+        implicit val ctV = ClassTag(classOf[Any]).asInstanceOf[ClassTag[avt.InternalType]]
+        implicit val ctL = ClassTag(classOf[Any]).asInstanceOf[ClassTag[alt.InternalType]]
+        fitGeneric[avt.InternalType, alt.InternalType](dataset)
+      case (avt: PhysicalDataType, _) =>
+        implicit val ctV = ClassTag(classOf[Any]).asInstanceOf[ClassTag[avt.InternalType]]
+        implicit val ctL = ClassTag(classOf[Any]).asInstanceOf[ClassTag[Any]]
+        fitGeneric[avt.InternalType, Any](dataset)
+      case (_, alt: PhysicalDataType) =>
+        implicit val ctV = ClassTag(classOf[Any]).asInstanceOf[ClassTag[Any]]
+        implicit val ctL = ClassTag(classOf[Any]).asInstanceOf[ClassTag[alt.InternalType]]
+        fitGeneric[Any, alt.InternalType](dataset)
+      case _ =>
+        implicit val ctV = ClassTag(classOf[Any]).asInstanceOf[ClassTag[Any]]
+        implicit val ctL = ClassTag(classOf[Any]).asInstanceOf[ClassTag[Any]]
+        fitGeneric[Any, Any](dataset)
+    }
   }
 
 }
 
 trait OptimizedKNNFitting extends KNNParams with SynapseMLLogging {
 
-  private def fitGeneric[V](dataset: Dataset[_])(implicit ctV: scala.reflect.ClassTag[V]): KNNModel = {
+  private def fitGeneric[V: ClassTag](dataset: Dataset[_]): KNNModel = {
 
     val kvlTuples = dataset.toDF().select(getFeaturesCol, getValuesCol).collect()
       .map { row =>
@@ -63,8 +83,15 @@ trait OptimizedKNNFitting extends KNNParams with SynapseMLLogging {
   }
 
   protected def fitOptimized(dataset: Dataset[_]): KNNModel = {
-    // Use Any for type parameters due to path-dependent type ClassTag limitations
-    fitGeneric[Any](dataset)
+
+    PhysicalDataType.apply(dataset.schema(getValuesCol).dataType) match {
+      case avt: PhysicalDataType =>
+        implicit val ctV = ClassTag(classOf[Any]).asInstanceOf[ClassTag[avt.InternalType]]
+        fitGeneric[avt.InternalType](dataset)
+      case _ =>
+        implicit val ctV = ClassTag(classOf[Any]).asInstanceOf[ClassTag[Any]]
+        fitGeneric[Any](dataset)
+    }
   }
 
 }

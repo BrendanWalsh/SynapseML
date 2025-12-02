@@ -226,7 +226,7 @@ class VerifyTrainClassifier extends Benchmarks with EstimatorFuzzing[TrainClassi
     Map(lrName -> createLR, dtName -> createDT,
       gbtName -> createGBT, rfName -> createRF,
       mlpName -> createMLP, nbName -> createNB)
-      .mapValues(creator => creator.setLabelCol(labelColumnName)).toMap
+      .mapValues(creator => creator.setLabelCol(labelColumnName))
       .filterKeys(!modelsToExclude(_))
       .mapValues(trainScoreDataset(labelColumnName, dataset, _)).toMap
   }

@@ -10,10 +10,9 @@ import com.microsoft.azure.synapse.ml.services.{HasServiceParams, HasUrlPath}
 import com.microsoft.azure.synapse.ml.io.http.HandlingUtils._
 import com.microsoft.azure.synapse.ml.io.http._
 import com.microsoft.azure.synapse.ml.param.ServiceParam
-import com.microsoft.azure.synapse.ml.services.geospatial.AzureMapsJsonProtocol._
 import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.CloseableHttpClient
-import spray.json.DefaultJsonProtocol.{DoubleJsonFormat, StringJsonFormat, seqFormat}
+import spray.json.DefaultJsonProtocol._
 
 import java.net.URI
 import java.util.concurrent.TimeoutException

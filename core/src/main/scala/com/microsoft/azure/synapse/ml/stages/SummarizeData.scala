@@ -136,9 +136,8 @@ class SummarizeData(override val uid: String)
   private def computeCountsImpl(col: String, df: DataFrame): Array[Double] = {
     val column = df.col(col)
     val dataType = df.schema(col).dataType
-    val isNumericType = dataType.isInstanceOf[NumericType] || dataType.equals(BooleanType)
-    val mExpr = if (isNumericType) {
-      isnull(column) || (if (dataType.equals(BooleanType)) isnan(column.cast(DoubleType)) else isnan(column))
+    val mExpr = if (dataType == FloatType || dataType == DoubleType) {
+      isnull(column) || isnan(column)
     } else {
       isnull(column)
     }

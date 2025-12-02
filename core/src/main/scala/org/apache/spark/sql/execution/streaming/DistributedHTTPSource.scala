@@ -8,6 +8,8 @@ import com.sun.net.httpserver.{HttpExchange, HttpHandler, HttpServer}
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.encoders.ExpressionEncoder
+import org.apache.spark.sql.catalyst.plans.logical.LocalRelation
+import org.apache.spark.sql.catalyst.expressions.AttributeReference
 import org.apache.spark.sql.connector.read.streaming.{Offset => OffsetV2}
 import org.apache.spark.sql.execution.streaming.continuous.HTTPSourceV2
 import org.apache.spark.sql.sources.{DataSourceRegister, StreamSinkProvider, StreamSourceProvider}
@@ -248,7 +250,42 @@ class DistributedHTTPSource(name: String,
     serverInfoConfigured
   }
 
-  private[spark] val serverInfoDFStreaming = serverInfoDF
+  private[spark] val serverInfoDFStreaming = {
+    val serializer = infoEnc.createSerializer()
+    val serverInfoConfRDD = serverInfoDF.rdd.map(serializer)
+    val rowRdd = serverInfoConfRDD.map(ir => Row.fromSeq(ir.toSeq(schema)))
+    val df = sqlContext.sparkSession.createDataFrame(rowRdd, schema)
+
+    // Reflection hack to set isStreaming=true via LocalRelation
+    try {
+      var clazz: Class[_] = df.getClass
+      var field: java.lang.reflect.Field = null
+      while (clazz != null && field == null) {
+        try {
+          field = clazz.getDeclaredField("logicalPlan")
+        } catch {
+          case _: NoSuchFieldException => clazz = clazz.getSuperclass
+        }
+      }
+      if (field != null) {
+        field.setAccessible(true)
+        val attributes = schema.map(f =>
+          AttributeReference(f.name, f.dataType, f.nullable, f.metadata)()
+        )
+        val newPlan = LocalRelation(
+          attributes,
+          serverInfoConfRDD.collect().toSeq,
+          isStreaming = true
+        )
+        field.set(df, newPlan)
+      } else {
+        logError("DEBUG: logicalPlan field not found")
+      }
+    } catch {
+      case e: Exception => logError(s"DEBUG: Reflection hack failed: $e")
+    }
+    df
+  }
 
   @GuardedBy("this")
   protected var currentOffset: LongOffset = new LongOffset(-1)
@@ -314,16 +351,19 @@ class DistributedHTTPSourceProvider extends StreamSourceProvider with DataSource
                             providerName: String,
                             parameters: Map[String, String]): (String, StructType) = {
     if (!parameters.contains("host")) {
-      throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY",
-        Map("key" -> "host", "message" -> "Set a host to read from with option(\"host\", ...)"))
+      throw new AnalysisException(
+        errorClass = "INTERNAL_ERROR",
+        messageParameters = Map("message" -> "Set a host to read from with option(\"host\", ...)."))
     }
     if (!parameters.contains("port")) {
-      throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY",
-        Map("key" -> "port", "message" -> "Set a port to read from with option(\"port\", ...)"))
+      throw new AnalysisException(
+        errorClass = "INTERNAL_ERROR",
+        messageParameters = Map("message" -> "Set a port to read from with option(\"port\", ...)."))
     }
     if (!parameters.contains("path")) {
-      throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY",
-        Map("key" -> "path", "message" -> "Set a name of the API which is used for routing"))
+      throw new AnalysisException(
+        errorClass = "INTERNAL_ERROR",
+        messageParameters = Map("message" -> "Set a name of the API which is used for routing"))
     }
     ("DistributedHTTP", HTTPSourceV2.Schema)
   }
@@ -361,8 +401,8 @@ class DistributedHTTPSink(val options: Map[String, String])
     extends Sink with Logging with Serializable {
 
   if (!options.contains("name")) {
-    throw new AnalysisException("INVALID_OPTIONS.MISSING_KEY",
-      Map("key" -> "name", "message" -> "Set a name of an API to reply to"))
+    throw new AnalysisException(errorClass = "INTERNAL_ERROR",
+      messageParameters = Map("message" -> "Set a name of an API to reply to"))
   }
   override def name: String = options("name")
 

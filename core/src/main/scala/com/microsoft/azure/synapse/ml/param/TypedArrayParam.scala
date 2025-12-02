@@ -23,8 +23,8 @@ abstract class TypedArrayParam[T: TypeTag](parent: Params,
   def w(v: java.util.ArrayList[T]): ParamPair[Seq[T]] = w(v.asScala.toSeq)
 
   override def rValue(v: Seq[T]): String = {
-    val seqFmt: JsonFormat[Seq[T]] = seqFormat[T](dataFormat).asInstanceOf[JsonFormat[Seq[T]]]
-    RWrappableParam.rDefaultRender(v)(seqFmt)
+    implicit val defaultFormat = seqFormat[T]
+    RWrappableParam.rDefaultRender(v)(seqFormat[T].asInstanceOf[JsonFormat[Seq[T]]])
   }
 
   override def rConstructorLine(v: Seq[T]): String = {
