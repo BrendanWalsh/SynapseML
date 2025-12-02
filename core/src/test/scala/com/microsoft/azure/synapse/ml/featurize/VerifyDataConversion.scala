@@ -129,7 +129,7 @@ class VerifyDataConversions extends TestBase with TransformerFuzzing[DataConvers
     val expectedDF = spark.createDataFrame(spark.sparkContext.parallelize(Seq(
       Row(1.toShort, 1.toShort, 2.toShort, 3.toShort, 4.toShort, 5.toShort, 6.toShort, 7.toShort, 8.toShort),
       Row(0.toShort, 9.toShort, 10.toShort, 11.toShort, 12.toShort, 14.toShort, 15.toShort, 16.toShort, 17.toShort),
-      Row(1.toShort, -127.toShort, 345.toShort, null, null, 18.toShort, 20.toShort, 100.toShort,
+      Row(1.toShort, -127.toShort, 345.toShort, null, null, 18.toShort, 20.toShort, 100.toShort, //scalastyle:ignore null
         200.toShort) //scalastyle:ignore null
     )), schema)
     assert(expectedDF.except(generateRes("short", masterInDF)).count == 0)

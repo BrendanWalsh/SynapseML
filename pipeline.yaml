@@ -479,7 +479,8 @@ jobs:
         scriptType: bash
         inlineScript: |
           set -e
-          export SBT_OPTS="-Xms2G -Xss5M  -Duser.timezone=GMT --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED"
+          export SBT_OPTS="-Xms2G -Xss5M  -Duser.timezone=GMT"
+          export JAVA_TOOL_OPTIONS="--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED"
           source activate synapseml
           (timeout 5m sbt setup) || (echo "retrying" && timeout 5m sbt setup) || (echo "retrying" && timeout 5m sbt setup)
           sbt codegen
@@ -498,7 +499,8 @@ jobs:
         scriptType: bash
         inlineScript: |
           set -e
-          export SBT_OPTS="-Xms2G -Xmx4G -Xss5M  -Duser.timezone=GMT --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED"
+          export SBT_OPTS="-Xms2G -Xmx4G -Xss5M  -Duser.timezone=GMT"
+          export JAVA_TOOL_OPTIONS="--add-opens=java.prefs/java.util.prefs=ALL-UNNAMED"
           source activate synapseml
           timeout 20m sbt -DskipCodegen=true "project $(PACKAGE)" testR
     - task: PublishTestResults@2
