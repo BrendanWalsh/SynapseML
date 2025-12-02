@@ -75,6 +75,7 @@ class AdvancedRankingMetrics(predictionAndLabels: RDD[(Array[Any], Array[Any])],
 
   def matchMetric(metricName: String): Double = metricName match {
     case "map"          => map
+    case "mapk"         => map
     case "ndcgAt"       => ndcg
     case "precisionAtk" => precisionAtk
     case "recallAtK"    => recallAtK

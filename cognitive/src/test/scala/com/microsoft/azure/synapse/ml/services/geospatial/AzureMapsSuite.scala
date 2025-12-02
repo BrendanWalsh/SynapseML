@@ -23,9 +23,7 @@ trait AzureMapsKey {
   lazy val azureMapsKey: String = sys.env.getOrElse("AZURE_MAPS_KEY", Secrets.AzureMapsKey)
 }
 
-import org.scalatest.Ignore
 
-@Ignore
 class AzMapsSearchAddressSuite extends TransformerFuzzing[AddressGeocoder] with AzureMapsKey {
 
   import spark.implicits._
@@ -86,7 +84,7 @@ class AzMapsSearchAddressSuite extends TransformerFuzzing[AddressGeocoder] with 
   override def reader: MLReadable[_] = AddressGeocoder
 }
 
-@Ignore
+
 class AzMapsSearchReverseAddressSuite extends TransformerFuzzing[ReverseAddressGeocoder] with AzureMapsKey {
 
   import spark.implicits._
