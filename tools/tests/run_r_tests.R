@@ -4,6 +4,9 @@ if (!require("sparklyr")) {
 }
 
 tar_path <- paste(getwd(), "/../../../../../../spark-4.0.1-bin-hadoop3.tgz", sep = "")
+Sys.unsetenv("SPARK_HOME")
+Sys.setenv(JAVA_HOME = "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home")
+
 if (file.exists(tar_path)) {
   spark_install_tar(tar_path)
 } else {
@@ -19,4 +22,8 @@ if (file.exists(tar_path)) {
 }
 
 options("testthat.output_file" = "../../../../r-test-results.xml")
-devtools::test(reporter = JunitReporter$new())
+if (!require("testthat")) {
+  packages.install("testthat")
+  library("testthat")
+}
+devtools::test(reporter = testthat::JunitReporter$new())
