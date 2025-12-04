@@ -37,7 +37,9 @@ object JarLoadingUtils {
         if (jarResource == null) {
           throw new IOException(s"Could not find resource for class ${c.getSimpleName}")
         }
-        jarResource.toString.contains(_)
+        val artifactPattern = "(.+?_\\d+\\.\\d+)".r
+        val artifactName = artifactPattern.findFirstIn(name).getOrElse(name)
+        jarResource.toString.contains(artifactName) || jarResource.getProtocol == "file"
       }))
       .filter(clazz => !Modifier.isAbstract(clazz.getModifiers))
       .map(instantiate(_)).asInstanceOf[List[T]]
