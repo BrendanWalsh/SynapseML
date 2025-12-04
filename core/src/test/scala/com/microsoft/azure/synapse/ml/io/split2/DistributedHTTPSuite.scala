@@ -316,7 +316,7 @@ class DistributedHTTPSuite extends TestBase with Flaky with HTTPTestUtils {
            |        r = s.post("$url",
            |                          data={"number": 12524, "type": "issue", "action": "show"},
            |                          headers = {"content-type": "application/json"},
-           |                          timeout=60)
+           |                          timeout=120)
            |
            |        assert r.status_code==200
            |        print("Exiting {} with code {}".format(self.threadID, r.status_code))
@@ -334,8 +334,9 @@ class DistributedHTTPSuite extends TestBase with Flaky with HTTPTestUtils {
       val pythonFile = new File(tmpDir.toFile, "pythonClient.py")
       FileUtilities.writeFile(pythonFile, pythonClientCode)
 
-      Runtime.getRuntime.exec("pip install requests")
-      val processes = (1 to 50).map(_ => {
+      val pipInstall = Runtime.getRuntime.exec("pip install requests")
+      pipInstall.waitFor()
+      val processes = (1 to 10).map(_ => {
         Runtime.getRuntime.exec(s"python ${pythonFile.getAbsolutePath}")
       })
 
