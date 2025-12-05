@@ -163,22 +163,27 @@ class DistributedHTTPSuite extends TestBase with Flaky with HTTPTestUtils {
   // Logger.getLogger(classOf[DistributedHTTPSource]).setLevel(Level.INFO)
   // Logger.getLogger(classOf[JVMSharedServer]).setLevel(Level.INFO)
 
+  override val host = "127.0.0.1"
+
   def baseReaderDist: DataStreamReader = {
     spark.readStream.distributedServer
       .address(host, port, "foo")
       .option("maxPartitions", 3)
+      .option("maxPortAttempts", "1")
   }
 
   def baseReader: DataStreamReader = {
     spark.readStream.server
       .address(host, port, "foo")
       .option("maxPartitions", 3)
+      .option("maxPortAttempts", "1")
   }
 
   def baseWriterDist(df: DataFrame): DataStreamWriter[Row] = {
     df.writeStream
       .distributedServer
       .option("name", "foo")
+      .option("maxPortAttempts", "1")
       .queryName("foo")
       .option("checkpointLocation",
         new File(tmpDir.toFile, s"checkpoints-${UUID.randomUUID()}").toString)
@@ -188,6 +193,7 @@ class DistributedHTTPSuite extends TestBase with Flaky with HTTPTestUtils {
     df.writeStream
       .server
       .option("name", "foo")
+      .option("maxPortAttempts", "1")
       .queryName("foo")
       .option("checkpointLocation",
         new File(tmpDir.toFile, s"checkpoints-${UUID.randomUUID()}").toString)
